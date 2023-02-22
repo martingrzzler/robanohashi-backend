@@ -52,13 +52,13 @@ type Radical struct {
 }
 
 type Kanji struct {
-	AmalgamationSubjectIds []int `json:"amalgamation_subject_ids"`
+	AmalgamationSubjectIds []any `json:"amalgamation_subject_ids"`
 	AuxiliaryMeanings      []struct {
 		Meaning string `json:"meaning"`
 		Type    string `json:"type"`
 	} `json:"auxiliary_meanings"`
 	Characters          string      `json:"characters"`
-	ComponentSubjectIds []int       `json:"component_subject_ids"`
+	ComponentSubjectIds []any       `json:"component_subject_ids"`
 	CreatedAt           time.Time   `json:"created_at"`
 	DocumentURL         string      `json:"document_url"`
 	HiddenAt            interface{} `json:"hidden_at"`
@@ -77,11 +77,11 @@ type Kanji struct {
 		AcceptedAnswer bool   `json:"accepted_answer"`
 		Reading        string `json:"reading"`
 	} `json:"readings"`
-	ReadingMnemonic           string        `json:"reading_mnemonic"`
-	ReadingHint               string        `json:"reading_hint"`
-	Slug                      string        `json:"slug"`
-	VisuallySimilarSubjectIds []interface{} `json:"visually_similar_subject_ids"`
-	SpacedRepetitionSystemID  int           `json:"spaced_repetition_system_id"`
+	ReadingMnemonic           string `json:"reading_mnemonic"`
+	ReadingHint               string `json:"reading_hint"`
+	Slug                      string `json:"slug"`
+	VisuallySimilarSubjectIds []any  `json:"visually_similar_subject_ids"`
+	SpacedRepetitionSystemID  int    `json:"spaced_repetition_system_id"`
 }
 
 type Vocabulary struct {
