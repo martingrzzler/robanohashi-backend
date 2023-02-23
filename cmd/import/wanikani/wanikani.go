@@ -1,21 +1,16 @@
-package main
+package wanikani
 
-import "time"
-
-type Object string
-
-const (
-	ObjectKanji      Object = "kanji"
-	ObjectRadical    Object = "radical"
-	ObjectVocabulary Object = "vocabulary"
+import (
+	"robanohashi/model"
+	"time"
 )
 
 type Subject[T Data] struct {
-	ID            int    `json:"id"`
-	Object        Object `json:"object"`
-	Url           string `json:"url"`
-	DataUpdatedAt string `json:"data_updated_at"`
-	Data          T      `json:"data"`
+	ID            int          `json:"id"`
+	Object        model.Object `json:"object"`
+	Url           string       `json:"url"`
+	DataUpdatedAt string       `json:"data_updated_at"`
+	Data          T            `json:"data"`
 }
 
 type Data interface {
@@ -52,13 +47,13 @@ type Radical struct {
 }
 
 type Kanji struct {
-	AmalgamationSubjectIds []any `json:"amalgamation_subject_ids"`
+	AmalgamationSubjectIds []int `json:"amalgamation_subject_ids"`
 	AuxiliaryMeanings      []struct {
 		Meaning string `json:"meaning"`
 		Type    string `json:"type"`
 	} `json:"auxiliary_meanings"`
 	Characters          string      `json:"characters"`
-	ComponentSubjectIds []any       `json:"component_subject_ids"`
+	ComponentSubjectIds []int       `json:"component_subject_ids"`
 	CreatedAt           time.Time   `json:"created_at"`
 	DocumentURL         string      `json:"document_url"`
 	HiddenAt            interface{} `json:"hidden_at"`
@@ -80,7 +75,7 @@ type Kanji struct {
 	ReadingMnemonic           string `json:"reading_mnemonic"`
 	ReadingHint               string `json:"reading_hint"`
 	Slug                      string `json:"slug"`
-	VisuallySimilarSubjectIds []any  `json:"visually_similar_subject_ids"`
+	VisuallySimilarSubjectIds []int  `json:"visually_similar_subject_ids"`
 	SpacedRepetitionSystemID  int    `json:"spaced_repetition_system_id"`
 }
 
