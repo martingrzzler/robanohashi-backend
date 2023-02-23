@@ -13,3 +13,7 @@ func MeaningMnemonic(id int) string {
 func Kanji(id int) string {
 	return fmt.Sprintf("kanji:%d", id)
 }
+
+func Radical(id int) string {
+	return fmt.Sprintf("radical:%d", id)
+}

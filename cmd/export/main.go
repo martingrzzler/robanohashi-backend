@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"robanohashi/cmd/import/wanikani"
 )
 
 type Pages struct {
@@ -86,6 +87,22 @@ func createRequest(url string) *http.Request {
 
 func appendPageToFile(data []any, file *os.File) {
 	for _, item := range data {
+		// download character image for radicals
+		if item.(map[string]any)["object"] == "radical" {
+			radical := wanikani.Subject[wanikani.Radical]{}
+			b, err := json.Marshal(item)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = json.Unmarshal(b, &radical)
+			if err != nil {
+				log.Fatal(err)
+			}
+			url := getCharacterImageUrl(radical)
+			if url != "" {
+				item.(map[string]any)["data"].(map[string]any)["character_svg_image"] = fetchCharacterImage(url)
+			}
+		}
 		b, err := json.Marshal(item)
 		if err != nil {
 			log.Fatal(err)
@@ -98,4 +115,28 @@ func appendPageToFile(data []any, file *os.File) {
 			log.Fatal(err)
 		}
 	}
+}
+
+func getCharacterImageUrl(subject wanikani.Subject[wanikani.Radical]) string {
+	for _, img := range subject.Data.CharacterImages {
+		if img.ContentType == "image/svg+xml" && !img.Metadata.InlineStyles {
+			return img.URL
+		}
+	}
+	return ""
+}
+
+func fetchCharacterImage(url string) string {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(bytes)
 }

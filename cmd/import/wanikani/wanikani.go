@@ -23,7 +23,9 @@ type Radical struct {
 		Meaning string `json:"meaning"`
 		Type    string `json:"type"`
 	} `json:"auxiliary_meanings"`
-	Characters      string `json:"characters"`
+	Characters        string `json:"characters"`
+	CharacterSvgImage string `json:"character_svg_image"`
+
 	CharacterImages []struct {
 		URL      string `json:"url"`
 		Metadata struct {

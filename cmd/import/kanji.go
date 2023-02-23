@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func InsertKanji(ctx context.Context, cfg Config, wkKanji wanikani.Subject[wanikani.Kanji]) {
+func InsertKanji(ctx context.Context, cfg Config, wkKanji *wanikani.Subject[wanikani.Kanji]) {
 	err := cfg.client.Incr(ctx, keys.MeaningMnemonicIds()).Err()
 	if err != nil {
 		log.Fatal(err)
@@ -25,7 +25,7 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji wanikani.Subject[wanik
 
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
-		Text:      createMeaningMnemonic(&wkKanji),
+		Text:      createMeaningMnemonic(wkKanji),
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 	}
@@ -40,10 +40,10 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji wanikani.Subject[wanik
 		Object:                    wkKanji.Object,
 		Characters:                wkKanji.Data.Characters,
 		Slug:                      wkKanji.Data.Slug,
-		ReadingMnemonic:           createReadingMnemonic(&wkKanji),
+		ReadingMnemonic:           createReadingMnemonic(wkKanji),
 		AmalgamationSubjectIds:    wkKanji.Data.AmalgamationSubjectIds,
-		Meanings:                  createKanjiMeanings(&wkKanji),
-		Readings:                  createKanjiReadings(&wkKanji),
+		Meanings:                  createKanjiMeanings(wkKanji),
+		Readings:                  createKanjiReadings(wkKanji),
 		ComponentSubjectIds:       wkKanji.Data.ComponentSubjectIds,
 		VisuallySimilarSubjectIds: wkKanji.Data.VisuallySimilarSubjectIds,
 		MeaningMnemonicIds:        []int{id},

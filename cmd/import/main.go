@@ -53,18 +53,14 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			InsertKanji(context.Background(), cfg, kanji)
+			InsertKanji(context.Background(), cfg, &kanji)
 		case model.ObjectRadical:
 			radical := wanikani.Subject[wanikani.Radical]{}
 			err = json.Unmarshal([]byte(line), &radical)
 			if err != nil {
 				log.Fatal(err)
 			}
-			key := fmt.Sprintf("radical:%d", radical.ID)
-			_, err = rdb.HSet(context.Background(), key, "characters", radical.Data.Characters).Result()
-			if err != nil {
-				log.Fatal(err)
-			}
+			InsertRadical(context.Background(), cfg, &radical)
 		case model.ObjectVocabulary:
 			vocabulary := wanikani.Subject[wanikani.Vocabulary]{}
 			err = json.Unmarshal([]byte(line), &vocabulary)
