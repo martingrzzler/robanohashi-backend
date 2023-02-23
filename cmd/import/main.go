@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
@@ -21,7 +20,7 @@ type Config struct {
 
 func main() {
 
-	rdb := Connect()
+	rdb := connect()
 	defer rdb.Close()
 
 	f, err := os.Open("subjects.json")
@@ -67,16 +66,12 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			key := fmt.Sprintf("vocabulary:%d", vocabulary.ID)
-			_, err = rdb.HSet(context.Background(), key, "characters", vocabulary.Data.Characters).Result()
-			if err != nil {
-				log.Fatal(err)
-			}
+			InsertVocabulary(context.Background(), cfg, &vocabulary)
 		}
 	}
 }
 
-func Connect() *redis.Client {
+func connect() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",

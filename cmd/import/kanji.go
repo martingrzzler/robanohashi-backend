@@ -25,7 +25,7 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji *wanikani.Subject[wani
 
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
-		Text:      createMeaningMnemonic(wkKanji),
+		Text:      createKanjiMeaningMnemonic(wkKanji),
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 	}
@@ -55,7 +55,7 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji *wanikani.Subject[wani
 	}
 }
 
-func createMeaningMnemonic(kanji *wanikani.Subject[wanikani.Kanji]) string {
+func createKanjiMeaningMnemonic(kanji *wanikani.Subject[wanikani.Kanji]) string {
 	meaningMnemonic := kanji.Data.MeaningMnemonic
 	if kanji.Data.MeaningHint != "" {
 		meaningMnemonic = meaningMnemonic + " " + kanji.Data.MeaningHint
@@ -63,10 +63,10 @@ func createMeaningMnemonic(kanji *wanikani.Subject[wanikani.Kanji]) string {
 	return meaningMnemonic
 }
 
-func createKanjiReadings(kanji *wanikani.Subject[wanikani.Kanji]) []model.Reading {
-	readings := make([]model.Reading, 0)
+func createKanjiReadings(kanji *wanikani.Subject[wanikani.Kanji]) []model.KanjiReading {
+	readings := make([]model.KanjiReading, 0)
 	for _, reading := range kanji.Data.Readings {
-		readings = append(readings, model.Reading{
+		readings = append(readings, model.KanjiReading{
 			Reading: reading.Reading,
 			Primary: reading.Primary,
 			Type:    reading.Type,
@@ -92,9 +92,9 @@ func createKanjiMeanings(kanji *wanikani.Subject[wanikani.Kanji]) []model.Meanin
 			Primary: meaning.Primary,
 		})
 	}
-	for _, aux_meaning := range kanji.Data.AuxiliaryMeanings {
+	for _, auxMeaning := range kanji.Data.AuxiliaryMeanings {
 		meanings = append(meanings, model.Meaning{
-			Meaning: aux_meaning.Meaning,
+			Meaning: auxMeaning.Meaning,
 			Primary: false,
 		})
 	}

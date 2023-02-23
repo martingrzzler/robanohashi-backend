@@ -17,3 +17,7 @@ func Kanji(id int) string {
 func Radical(id int) string {
 	return fmt.Sprintf("radical:%d", id)
 }
+
+func Vocabulary(id int) string {
+	return fmt.Sprintf("vocabulary:%d", id)
+}
