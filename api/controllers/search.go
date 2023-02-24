@@ -22,7 +22,14 @@ type SubjectPreview struct {
 }
 
 func Search(c *gin.Context) {
-	query := c.Param("query")
+	query := c.Query("query")
+
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "query parameter is required",
+		})
+		return
+	}
 
 	db := c.MustGet("db").(*persist.DB)
 

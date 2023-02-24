@@ -35,10 +35,12 @@ func main() {
 	req := createRequest("https://api.wanikani.com/v2/subjects")
 
 	for {
-
 		res, err := wanikani.Do(req)
 		if err != nil {
 			log.Fatal(err)
+		}
+		if res.StatusCode != http.StatusOK {
+			log.Fatalf("Failed to fetch subjects with status code %d", res.StatusCode)
 		}
 
 		if res.Body != nil {
@@ -119,7 +121,7 @@ func appendPageToFile(data []any, file *os.File) {
 
 func getCharacterImageUrl(subject wanikani.Subject[wanikani.Radical]) string {
 	for _, img := range subject.Data.CharacterImages {
-		if img.ContentType == "image/svg+xml" && !img.Metadata.InlineStyles {
+		if img.ContentType == "image/svg+xml" && img.Metadata.InlineStyles {
 			return img.URL
 		}
 	}

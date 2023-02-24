@@ -20,6 +20,6 @@ func main() {
 		c.Next()
 	})
 
-	router.GET("/search/:query", controllers.Search)
+	router.GET("/search", controllers.Search)
 	router.Run(":5000")
 }
