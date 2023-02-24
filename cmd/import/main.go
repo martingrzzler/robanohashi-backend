@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/model"
+	"robanohashi/db"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/nitishm/go-rejson/v4"
@@ -45,22 +45,22 @@ func main() {
 
 		json.Unmarshal([]byte(line), &data)
 
-		switch model.Object(data["object"].(string)) {
-		case model.ObjectKanji:
+		switch db.Object(data["object"].(string)) {
+		case db.ObjectKanji:
 			kanji := wanikani.Subject[wanikani.Kanji]{}
 			err = json.Unmarshal([]byte(line), &kanji)
 			if err != nil {
 				log.Fatal(err)
 			}
 			InsertKanji(context.Background(), cfg, &kanji)
-		case model.ObjectRadical:
+		case db.ObjectRadical:
 			radical := wanikani.Subject[wanikani.Radical]{}
 			err = json.Unmarshal([]byte(line), &radical)
 			if err != nil {
 				log.Fatal(err)
 			}
 			InsertRadical(context.Background(), cfg, &radical)
-		case model.ObjectVocabulary:
+		case db.ObjectVocabulary:
 			vocabulary := wanikani.Subject[wanikani.Vocabulary]{}
 			err = json.Unmarshal([]byte(line), &vocabulary)
 			if err != nil {

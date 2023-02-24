@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/keys"
-	"robanohashi/model"
+	"robanohashi/db"
+	"robanohashi/db/keys"
 	"strconv"
 	"time"
 )
@@ -23,7 +23,7 @@ func InsertVocabulary(ctx context.Context, cfg Config, wkVocabulary *wanikani.Su
 
 	id, _ := strconv.Atoi(val)
 
-	meaningMnemonic := model.MeaningMnemonic{
+	meaningMnemonic := db.MeaningMnemonic{
 		ID:        id,
 		Text:      wkVocabulary.Data.MeaningMnemonic,
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
@@ -35,7 +35,7 @@ func InsertVocabulary(ctx context.Context, cfg Config, wkVocabulary *wanikani.Su
 		log.Fatal(err)
 	}
 
-	vocabulary := model.Vocabulary{
+	vocabulary := db.Vocabulary{
 		ID:                  wkVocabulary.ID,
 		Object:              wkVocabulary.Object,
 		Characters:          wkVocabulary.Data.Characters,
@@ -54,10 +54,10 @@ func InsertVocabulary(ctx context.Context, cfg Config, wkVocabulary *wanikani.Su
 	}
 }
 
-func createContextSentences(v *wanikani.Subject[wanikani.Vocabulary]) []model.ContextSentence {
-	sentences := make([]model.ContextSentence, 0)
+func createContextSentences(v *wanikani.Subject[wanikani.Vocabulary]) []db.ContextSentence {
+	sentences := make([]db.ContextSentence, 0)
 	for _, sentence := range v.Data.ContextSentences {
-		sentences = append(sentences, model.ContextSentence{
+		sentences = append(sentences, db.ContextSentence{
 			En: sentence.En,
 			Ja: sentence.Ja,
 		})
@@ -66,10 +66,10 @@ func createContextSentences(v *wanikani.Subject[wanikani.Vocabulary]) []model.Co
 	return sentences
 }
 
-func createVocabReadings(v *wanikani.Subject[wanikani.Vocabulary]) []model.VocabularyReading {
-	readings := make([]model.VocabularyReading, 0)
+func createVocabReadings(v *wanikani.Subject[wanikani.Vocabulary]) []db.VocabularyReading {
+	readings := make([]db.VocabularyReading, 0)
 	for _, reading := range v.Data.Readings {
-		readings = append(readings, model.VocabularyReading{
+		readings = append(readings, db.VocabularyReading{
 			Reading: reading.Reading,
 			Primary: reading.Primary,
 		})
@@ -78,16 +78,16 @@ func createVocabReadings(v *wanikani.Subject[wanikani.Vocabulary]) []model.Vocab
 	return readings
 }
 
-func createVocabMeanings(v *wanikani.Subject[wanikani.Vocabulary]) []model.Meaning {
-	meanings := make([]model.Meaning, 0)
+func createVocabMeanings(v *wanikani.Subject[wanikani.Vocabulary]) []db.Meaning {
+	meanings := make([]db.Meaning, 0)
 	for _, meaning := range v.Data.Meanings {
-		meanings = append(meanings, model.Meaning{
+		meanings = append(meanings, db.Meaning{
 			Meaning: meaning.Meaning,
 			Primary: meaning.Primary,
 		})
 	}
 	for _, auxMeaning := range v.Data.AuxiliaryMeanings {
-		meanings = append(meanings, model.Meaning{
+		meanings = append(meanings, db.Meaning{
 			Meaning: auxMeaning.Meaning,
 			Primary: false,
 		})

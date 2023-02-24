@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/keys"
-	"robanohashi/model"
+	"robanohashi/db"
+	"robanohashi/db/keys"
 	"strconv"
 	"time"
 )
@@ -23,7 +23,7 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji *wanikani.Subject[wani
 
 	id, _ := strconv.Atoi(val)
 
-	meaningMnemonic := model.MeaningMnemonic{
+	meaningMnemonic := db.MeaningMnemonic{
 		ID:        id,
 		Text:      createKanjiMeaningMnemonic(wkKanji),
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
@@ -35,7 +35,7 @@ func InsertKanji(ctx context.Context, cfg Config, wkKanji *wanikani.Subject[wani
 		log.Fatal(err)
 	}
 
-	kanji := model.Kanji{
+	kanji := db.Kanji{
 		ID:                        wkKanji.ID,
 		Object:                    wkKanji.Object,
 		Characters:                wkKanji.Data.Characters,
@@ -63,10 +63,10 @@ func createKanjiMeaningMnemonic(kanji *wanikani.Subject[wanikani.Kanji]) string 
 	return meaningMnemonic
 }
 
-func createKanjiReadings(kanji *wanikani.Subject[wanikani.Kanji]) []model.KanjiReading {
-	readings := make([]model.KanjiReading, 0)
+func createKanjiReadings(kanji *wanikani.Subject[wanikani.Kanji]) []db.KanjiReading {
+	readings := make([]db.KanjiReading, 0)
 	for _, reading := range kanji.Data.Readings {
-		readings = append(readings, model.KanjiReading{
+		readings = append(readings, db.KanjiReading{
 			Reading: reading.Reading,
 			Primary: reading.Primary,
 			Type:    reading.Type,
@@ -84,16 +84,16 @@ func createReadingMnemonic(kanji *wanikani.Subject[wanikani.Kanji]) string {
 	return readingMnemonic
 }
 
-func createKanjiMeanings(kanji *wanikani.Subject[wanikani.Kanji]) []model.Meaning {
-	meanings := make([]model.Meaning, 0)
+func createKanjiMeanings(kanji *wanikani.Subject[wanikani.Kanji]) []db.Meaning {
+	meanings := make([]db.Meaning, 0)
 	for _, meaning := range kanji.Data.Meanings {
-		meanings = append(meanings, model.Meaning{
+		meanings = append(meanings, db.Meaning{
 			Meaning: meaning.Meaning,
 			Primary: meaning.Primary,
 		})
 	}
 	for _, auxMeaning := range kanji.Data.AuxiliaryMeanings {
-		meanings = append(meanings, model.Meaning{
+		meanings = append(meanings, db.Meaning{
 			Meaning: auxMeaning.Meaning,
 			Primary: false,
 		})

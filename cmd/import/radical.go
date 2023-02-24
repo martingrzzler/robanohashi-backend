@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/keys"
-	"robanohashi/model"
+	"robanohashi/db"
+	"robanohashi/db/keys"
 )
 
 func InsertRadical(ctx context.Context, cfg Config, wkRadical *wanikani.Subject[wanikani.Radical]) {
-	radical := model.Radical{
+	radical := db.Radical{
 		ID:                     wkRadical.ID,
 		Object:                 wkRadical.Object,
 		Slug:                   wkRadical.Data.Slug,
@@ -26,10 +26,10 @@ func InsertRadical(ctx context.Context, cfg Config, wkRadical *wanikani.Subject[
 	}
 }
 
-func createRadicalMeanings(wkRadical *wanikani.Subject[wanikani.Radical]) []model.Meaning {
-	meanings := make([]model.Meaning, len(wkRadical.Data.Meanings))
+func createRadicalMeanings(wkRadical *wanikani.Subject[wanikani.Radical]) []db.Meaning {
+	meanings := make([]db.Meaning, len(wkRadical.Data.Meanings))
 	for i, meaning := range wkRadical.Data.Meanings {
-		meanings[i] = model.Meaning{
+		meanings[i] = db.Meaning{
 			Meaning: meaning.Meaning,
 			Primary: meaning.Primary,
 		}
