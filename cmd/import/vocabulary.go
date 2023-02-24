@@ -9,6 +9,8 @@ import (
 	"robanohashi/persist/keys"
 	"strconv"
 	"time"
+
+	"github.com/gojp/kana"
 )
 
 func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikani.Subject[wanikani.Vocabulary]) {
@@ -73,6 +75,7 @@ func createVocabReadings(v *wanikani.Subject[wanikani.Vocabulary]) []model.Vocab
 		readings = append(readings, model.VocabularyReading{
 			Reading: reading.Reading,
 			Primary: reading.Primary,
+			Romaji:  kana.KanaToRomaji(reading.Reading),
 		})
 	}
 

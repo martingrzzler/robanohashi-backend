@@ -21,4 +21,5 @@ type ContextSentence struct {
 type VocabularyReading struct {
 	Reading string `json:"reading"`
 	Primary bool   `json:"primary"`
+	Romaji  string `json:"romaji"`
 }

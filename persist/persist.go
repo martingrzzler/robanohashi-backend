@@ -62,6 +62,7 @@ func (db *DB) CreateIndices() error {
 		"$.characters", "AS", "characters", "TAG",
 		"$.meanings.*.meaning", "AS", "meaning", "TEXT",
 		"$.readings.*.reading", "AS", "reading", "TAG",
+		"$.readings.*.romaji", "AS", "romaji", "TAG",
 	).Err()
 
 	return err
