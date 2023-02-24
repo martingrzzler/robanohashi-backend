@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
@@ -25,6 +26,7 @@ func main() {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
+	count := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -55,5 +57,9 @@ func main() {
 			}
 			InsertVocabulary(context.Background(), db, &vocabulary)
 		}
+
+		count++
 	}
+
+	fmt.Printf("Successfully imported data %d records", count)
 }

@@ -26,3 +26,11 @@ type KanjiReading struct {
 	Primary bool   `json:"primary"`
 	Type    string `json:"type"`
 }
+
+func (k KanjiReading) GetReading() string {
+	return k.Reading
+}
+
+func (k KanjiReading) IsPrimary() bool {
+	return k.Primary
+}

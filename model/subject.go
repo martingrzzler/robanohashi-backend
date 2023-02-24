@@ -1,5 +1,10 @@
 package model
 
+type Reading interface {
+	GetReading() string
+	IsPrimary() bool
+}
+
 type Object string
 
 const (

@@ -23,3 +23,11 @@ type VocabularyReading struct {
 	Primary bool   `json:"primary"`
 	Romaji  string `json:"romaji"`
 }
+
+func (v VocabularyReading) GetReading() string {
+	return v.Reading
+}
+
+func (v VocabularyReading) IsPrimary() bool {
+	return v.Primary
+}
