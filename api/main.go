@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"robanohashi/api/controllers"
 	"robanohashi/persist"
 
 	"github.com/gin-gonic/gin"
@@ -13,21 +13,13 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to connect to Redis:", err)
 	}
-
 	router := gin.Default()
-	router.GET("/search/:query", func(c *gin.Context) {
-		query := c.Param("query")
 
-		res, err := db.SearchSubjects(query)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-		}
-
-		c.JSON(200, gin.H{
-			"data": res,
-		})
+	router.Use(func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
 	})
+
+	router.GET("/search/:query", controllers.Search)
 	router.Run(":5000")
 }
