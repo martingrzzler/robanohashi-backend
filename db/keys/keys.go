@@ -21,3 +21,7 @@ func Radical(id int) string {
 func Vocabulary(id int) string {
 	return fmt.Sprintf("vocabulary:%d", id)
 }
+
+func SearchIndex() string {
+	return "search_index"
+}

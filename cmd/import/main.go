@@ -20,7 +20,10 @@ type Config struct {
 
 func main() {
 
-	rdb := connect()
+	rdb, err := db.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer rdb.Close()
 
 	f, err := os.Open("subjects.json")
@@ -69,19 +72,4 @@ func main() {
 			InsertVocabulary(context.Background(), cfg, &vocabulary)
 		}
 	}
-}
-
-func connect() *redis.Client {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-
-	_, err := rdb.Ping(rdb.Context()).Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return rdb
 }
