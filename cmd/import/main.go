@@ -7,38 +7,22 @@ import (
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/db"
-
-	"github.com/go-redis/redis/v8"
-	"github.com/nitishm/go-rejson/v4"
+	"robanohashi/model"
+	"robanohashi/persist"
 )
 
-type Config struct {
-	json   *rejson.Handler
-	client *redis.Client
-}
-
 func main() {
-
-	rdb, err := db.Connect()
+	db, err := persist.Connect()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rdb.Close()
+	defer db.Close()
 
 	f, err := os.Open("subjects.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
-
-	rh := rejson.NewReJSONHandler()
-	rh.SetGoRedisClient(rdb)
-
-	cfg := Config{
-		json:   rh,
-		client: rdb,
-	}
 
 	scanner := bufio.NewScanner(f)
 
@@ -48,28 +32,28 @@ func main() {
 
 		json.Unmarshal([]byte(line), &data)
 
-		switch db.Object(data["object"].(string)) {
-		case db.ObjectKanji:
+		switch model.Object(data["object"].(string)) {
+		case model.ObjectKanji:
 			kanji := wanikani.Subject[wanikani.Kanji]{}
 			err = json.Unmarshal([]byte(line), &kanji)
 			if err != nil {
 				log.Fatal(err)
 			}
-			InsertKanji(context.Background(), cfg, &kanji)
-		case db.ObjectRadical:
+			InsertKanji(context.Background(), db, &kanji)
+		case model.ObjectRadical:
 			radical := wanikani.Subject[wanikani.Radical]{}
 			err = json.Unmarshal([]byte(line), &radical)
 			if err != nil {
 				log.Fatal(err)
 			}
-			InsertRadical(context.Background(), cfg, &radical)
-		case db.ObjectVocabulary:
+			InsertRadical(context.Background(), db, &radical)
+		case model.ObjectVocabulary:
 			vocabulary := wanikani.Subject[wanikani.Vocabulary]{}
 			err = json.Unmarshal([]byte(line), &vocabulary)
 			if err != nil {
 				log.Fatal(err)
 			}
-			InsertVocabulary(context.Background(), cfg, &vocabulary)
+			InsertVocabulary(context.Background(), db, &vocabulary)
 		}
 	}
 }

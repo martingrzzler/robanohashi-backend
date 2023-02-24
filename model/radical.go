@@ -1,4 +1,4 @@
-package db
+package model
 
 type Radical struct {
 	ID     int    `json:"id"`

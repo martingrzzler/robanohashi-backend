@@ -4,12 +4,13 @@ import (
 	"context"
 	"log"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/db"
-	"robanohashi/db/keys"
+	"robanohashi/model"
+	"robanohashi/persist"
+	"robanohashi/persist/keys"
 )
 
-func InsertRadical(ctx context.Context, cfg Config, wkRadical *wanikani.Subject[wanikani.Radical]) {
-	radical := db.Radical{
+func InsertRadical(ctx context.Context, db *persist.DB, wkRadical *wanikani.Subject[wanikani.Radical]) {
+	radical := model.Radical{
 		ID:                     wkRadical.ID,
 		Object:                 wkRadical.Object,
 		Slug:                   wkRadical.Data.Slug,
@@ -20,16 +21,16 @@ func InsertRadical(ctx context.Context, cfg Config, wkRadical *wanikani.Subject[
 		MeaningMnemonic:        wkRadical.Data.MeaningMnemonic,
 	}
 
-	_, err := cfg.json.JSONSet(keys.Radical(wkRadical.ID), "$", radical)
+	_, err := db.JSONHandler().JSONSet(keys.Radical(wkRadical.ID), "$", radical)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func createRadicalMeanings(wkRadical *wanikani.Subject[wanikani.Radical]) []db.Meaning {
-	meanings := make([]db.Meaning, len(wkRadical.Data.Meanings))
+func createRadicalMeanings(wkRadical *wanikani.Subject[wanikani.Radical]) []model.Meaning {
+	meanings := make([]model.Meaning, len(wkRadical.Data.Meanings))
 	for i, meaning := range wkRadical.Data.Meanings {
-		meanings[i] = db.Meaning{
+		meanings[i] = model.Meaning{
 			Meaning: meaning.Meaning,
 			Primary: meaning.Primary,
 		}

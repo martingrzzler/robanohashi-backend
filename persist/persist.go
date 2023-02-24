@@ -1,14 +1,24 @@
-package db
+package persist
 
 import (
 	"context"
-	"robanohashi/db/keys"
+	"robanohashi/persist/keys"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/nitishm/go-rejson/v4"
 )
 
 type DB struct {
-	rdb *redis.Client
+	rdb         *redis.Client
+	jsonHandler *rejson.Handler
+}
+
+func (db *DB) JSONHandler() *rejson.Handler {
+	return db.jsonHandler
+}
+
+func (db *DB) Client() *redis.Client {
+	return db.rdb
 }
 
 func Connect() (*DB, error) {
@@ -23,7 +33,10 @@ func Connect() (*DB, error) {
 		return nil, err
 	}
 
-	return &DB{rdb: rdb}, nil
+	handler := rejson.NewReJSONHandler()
+	handler.SetGoRedisClient(rdb)
+
+	return &DB{rdb: rdb, jsonHandler: handler}, nil
 }
 
 func (db *DB) CreateIndices() error {

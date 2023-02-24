@@ -1,4 +1,4 @@
-package db
+package model
 
 type Kanji struct {
 	ID                        int            `json:"id"`

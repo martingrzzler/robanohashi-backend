@@ -1,4 +1,4 @@
-package db
+package model
 
 type Vocabulary struct {
 	ID                  int                 `json:"id"`

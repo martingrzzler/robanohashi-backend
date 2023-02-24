@@ -1,16 +1,16 @@
 package wanikani
 
 import (
-	"robanohashi/db"
+	"robanohashi/model"
 	"time"
 )
 
 type Subject[T Data] struct {
-	ID            int       `json:"id"`
-	Object        db.Object `json:"object"`
-	Url           string    `json:"url"`
-	DataUpdatedAt string    `json:"data_updated_at"`
-	Data          T         `json:"data"`
+	ID            int          `json:"id"`
+	Object        model.Object `json:"object"`
+	Url           string       `json:"url"`
+	DataUpdatedAt string       `json:"data_updated_at"`
+	Data          T            `json:"data"`
 }
 
 type Data interface {

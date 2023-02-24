@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"robanohashi/db"
+	"robanohashi/persist"
 )
 
 func main() {
-	db, err := db.Connect()
+	db, err := persist.Connect()
 	if err != nil {
 		log.Fatal(err)
 	}
