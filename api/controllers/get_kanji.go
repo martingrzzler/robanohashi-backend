@@ -41,15 +41,15 @@ func GetKanji(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.Kanji{
-		ID:                        resolved.ID,
-		Object:                    resolved.Object,
-		Slug:                      resolved.Slug,
-		Characters:                resolved.Characters,
-		Meanings:                  resolved.Meanings,
-		Readings:                  resolved.Readings,
-		ReadingMnemonic:           resolved.ReadingMnemonic,
-		VisuallySimilarSubjectIds: dto.CreateSubjectPreviews(resolved.VisuallySimilarSubjects),
-		ComponentSubjects:         dto.CreateSubjectPreviews(resolved.ComponentSubjects),
-		AmalgamationSubjects:      dto.CreateSubjectPreviews(resolved.AmalgamationSubjects),
+		ID:                      resolved.ID,
+		Object:                  resolved.Object,
+		Slug:                    resolved.Slug,
+		Characters:              resolved.Characters,
+		Meanings:                resolved.Meanings,
+		Readings:                resolved.Readings,
+		ReadingMnemonic:         resolved.ReadingMnemonic,
+		VisuallySimilarSubjects: dto.CreateSubjectPreviews(resolved.VisuallySimilarSubjects),
+		ComponentSubjects:       dto.CreateSubjectPreviews(resolved.ComponentSubjects),
+		AmalgamationSubjects:    dto.CreateSubjectPreviews(resolved.AmalgamationSubjects),
 	})
 }
