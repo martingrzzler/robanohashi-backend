@@ -29,6 +29,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		Text:      createKanjiMeaningMnemonic(wkKanji),
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+		SubjectID: wkKanji.ID,
 	}
 
 	_, err = db.JSONHandler().JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
@@ -47,7 +48,6 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		Readings:                  createKanjiReadings(wkKanji),
 		ComponentSubjectIds:       wkKanji.Data.ComponentSubjectIds,
 		VisuallySimilarSubjectIds: wkKanji.Data.VisuallySimilarSubjectIds,
-		MeaningMnemonicIds:        []int{id},
 	}
 
 	_, err = db.JSONHandler().JSONSet(keys.Kanji(wkKanji.ID), "$", kanji)

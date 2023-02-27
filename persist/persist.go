@@ -55,9 +55,38 @@ func (db *DB) CreateIndices() error {
 	}
 
 	// Create indices
-	err = db.rdb.Do(context.Background(),
+	err = db.createSubjectIndex()
+	if err != nil {
+		return fmt.Errorf("failed to create subject index: %w", err)
+	}
+
+	err = db.createMeaningMnemonicIndex()
+
+	if err != nil {
+		return fmt.Errorf("failed to create meaning mnemonic index: %w", err)
+	}
+
+	return nil
+}
+
+func (db *DB) createMeaningMnemonicIndex() error {
+	err := db.rdb.Do(context.Background(),
 		"FT.CREATE",
-		keys.SearchIndex(),
+		keys.MeaningMnemonicIndex(),
+		"ON", "JSON",
+		"PREFIX", "1", "meaning_mnemonic:",
+		"SCHEMA",
+		"$.kanji_id", "AS", "kanji_id", "TAG",
+	).Err()
+
+	return err
+}
+
+func (db *DB) createSubjectIndex() error {
+	// Create indices
+	err := db.rdb.Do(context.Background(),
+		"FT.CREATE",
+		keys.SubjectIndex(),
 		"ON", "JSON",
 		"PREFIX", "3", "kanji:", "radical:", "vocabulary:",
 		"SCHEMA",
@@ -68,7 +97,6 @@ func (db *DB) CreateIndices() error {
 	).Err()
 
 	return err
-
 }
 
 func (db *DB) Close() {
@@ -84,5 +112,11 @@ func (db *DB) SearchSubjects(search string) (any, error) {
 		query = fmt.Sprintf("((@characters:{%s}) => { $weight: 2.0 } | (@meaning:(%s)) | (@reading:{%s}) | (@romaji:{%s}))", search, search, search, search)
 	}
 
-	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SearchIndex(), query).Result()
+	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query).Result()
 }
+
+// func (db *DB) GetKanji(id int) (any, error) {
+
+// 	data, err := db.jsonHandler.JSONGet(keys.Kanji(id), "$")
+
+// }

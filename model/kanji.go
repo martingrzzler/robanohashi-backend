@@ -11,12 +11,12 @@ type Kanji struct {
 	Readings                  []KanjiReading `json:"readings"`
 	ComponentSubjectIds       []int          `json:"component_subject_ids"`
 	VisuallySimilarSubjectIds []int          `json:"visually_similar_subject_ids"`
-	MeaningMnemonicIds        []int          `json:"meaning_mnemonic_ids"`
 }
 
 type MeaningMnemonic struct {
 	ID        int    `json:"id"`
 	Text      string `json:"text"`
+	SubjectID int    `json:"subject_id"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }

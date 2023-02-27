@@ -2,6 +2,7 @@ package keys
 
 import "fmt"
 
+// single int that is incremented every time a new meaning mnemonic is added
 func MeaningMnemonicIds() string {
 	return "meaning_mnemonic_ids"
 }
@@ -22,6 +23,10 @@ func Vocabulary(id int) string {
 	return fmt.Sprintf("vocabulary:%d", id)
 }
 
-func SearchIndex() string {
-	return "search_index"
+func SubjectIndex() string {
+	return "subject_index"
+}
+
+func MeaningMnemonicIndex() string {
+	return "meaning_mnemonic_index"
 }

@@ -10,7 +10,6 @@ type Vocabulary struct {
 	ReadingMnemonic     string              `json:"reading_mnemonic"`
 	ContextSentences    []ContextSentence   `json:"context_sentences"`
 	Readings            []VocabularyReading `json:"readings"`
-	MeaningMnemonicIds  []int               `json:"meaning_mnemonic_ids"`
 }
 
 type ContextSentence struct {

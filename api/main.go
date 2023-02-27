@@ -21,5 +21,6 @@ func main() {
 	})
 
 	router.GET("/search", controllers.Search)
+	router.GET("/kanji/:id", controllers.GetKanji)
 	router.Run(":5000")
 }

@@ -31,6 +31,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		Text:      wkVocabulary.Data.MeaningMnemonic,
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+		SubjectID: wkVocabulary.ID,
 	}
 
 	_, err = db.JSONHandler().JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
@@ -46,7 +47,6 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		ComponentSubjectIds: wkVocabulary.Data.ComponentSubjectIds,
 		Meanings:            createVocabMeanings(wkVocabulary),
 		ReadingMnemonic:     wkVocabulary.Data.ReadingMnemonic,
-		MeaningMnemonicIds:  []int{id},
 		Readings:            createVocabReadings(wkVocabulary),
 		ContextSentences:    createContextSentences(wkVocabulary),
 	}
