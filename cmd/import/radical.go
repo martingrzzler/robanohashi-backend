@@ -5,7 +5,7 @@ import (
 	"log"
 	"regexp"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/model"
+	"robanohashi/internal/model"
 	"robanohashi/persist"
 	"robanohashi/persist/keys"
 )

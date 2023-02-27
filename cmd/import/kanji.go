@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/model"
+	"robanohashi/internal/model"
 	"robanohashi/persist"
 	"robanohashi/persist/keys"
 	"strconv"

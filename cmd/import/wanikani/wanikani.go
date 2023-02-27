@@ -1,7 +1,7 @@
 package wanikani
 
 import (
-	"robanohashi/model"
+	"robanohashi/internal/model"
 	"time"
 )
 

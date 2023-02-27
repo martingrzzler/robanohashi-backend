@@ -11,3 +11,31 @@ type Radical struct {
 	Meanings               []Meaning `json:"meanings"`
 	MeaningMnemonic        string    `json:"meaning_mnemonic"`
 }
+
+func (r Radical) GetID() int {
+	return r.ID
+}
+
+func (r Radical) GetSlug() string {
+	return r.Slug
+}
+
+func (r Radical) GetObject() Object {
+	return r.Object
+}
+
+func (r Radical) GetCharacters() string {
+	return r.Characters
+}
+
+func (r Radical) GetCharacterImage() string {
+	return r.CharacterImage
+}
+
+func (r Radical) GetMeanings() []Meaning {
+	return r.Meanings
+}
+
+func (r Radical) GetReadings() []Reading {
+	return nil
+}

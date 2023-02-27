@@ -12,6 +12,40 @@ type Vocabulary struct {
 	Readings            []VocabularyReading `json:"readings"`
 }
 
+func (v Vocabulary) GetID() int {
+	return v.ID
+}
+
+func (v Vocabulary) GetSlug() string {
+	return v.Slug
+}
+
+func (v Vocabulary) GetObject() Object {
+	return v.Object
+}
+
+func (v Vocabulary) GetCharacters() string {
+	return v.Characters
+}
+
+func (v Vocabulary) GetCharacterImage() string {
+	return ""
+}
+
+func (v Vocabulary) GetMeanings() []Meaning {
+	return v.Meanings
+}
+
+func (v Vocabulary) GetReadings() []Reading {
+	readings := make([]Reading, len(v.Readings))
+
+	for i, r := range v.Readings {
+		readings[i] = r
+	}
+
+	return readings
+}
+
 type ContextSentence struct {
 	En string `json:"en"`
 	Ja string `json:"ja"`

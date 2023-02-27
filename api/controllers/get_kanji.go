@@ -1,36 +1,55 @@
 package controllers
 
 import (
-	"robanohashi/model"
+	"context"
+	"net/http"
+	"robanohashi/internal/dto"
+	"robanohashi/persist"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Kanji struct {
-	ID                        int                     `json:"id"`
-	Object                    model.Object            `json:"object"`
-	Characters                string                  `json:"characters"`
-	Slug                      string                  `json:"slug"`
-	ReadingMnemonic           string                  `json:"reading_mnemonic"`
-	AmalgamationSubjects      []SubjectPreview        `json:"amalgamation_subjects"`
-	Meanings                  []model.Meaning         `json:"meanings"`
-	Readings                  []model.KanjiReading    `json:"readings"`
-	ComponentSubjects         []SubjectPreview        `json:"component_subjects"`
-	VisuallySimilarSubjectIds []SubjectPreview        `json:"visually_similar_subject"`
-	MeaningMnemonicIds        []model.MeaningMnemonic `json:"meaning_mnemonic_ids"`
-}
-
 func GetKanji(c *gin.Context) {
-	// id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": "id must be an integer",
-	// 	})
-	// 	return
-	// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "id must be an integer",
+		})
+		return
+	}
 
-	// db := c.MustGet("db").(*persist.DB)
+	db := c.MustGet("db").(*persist.DB)
 
-	// res, err := db.GetKanji(id)
+	kanji, err := db.GetKanji(context.Background(), id)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "kanji not found",
+		})
+		return
+	}
+
+	resolved, err := db.GetKanjiResolved(context.Background(), kanji)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to resolve kanji",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.Kanji{
+		ID:                        resolved.ID,
+		Object:                    resolved.Object,
+		Slug:                      resolved.Slug,
+		Characters:                resolved.Characters,
+		Meanings:                  resolved.Meanings,
+		Readings:                  resolved.Readings,
+		ReadingMnemonic:           resolved.ReadingMnemonic,
+		VisuallySimilarSubjectIds: dto.CreateSubjectPreviews(resolved.VisuallySimilarSubjects),
+		ComponentSubjects:         dto.CreateSubjectPreviews(resolved.ComponentSubjects),
+		AmalgamationSubjects:      dto.CreateSubjectPreviews(resolved.AmalgamationSubjects),
+	})
 }

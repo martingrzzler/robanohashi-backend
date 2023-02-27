@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
-	"robanohashi/model"
+	"robanohashi/internal/model"
 	"robanohashi/persist"
 )
 
