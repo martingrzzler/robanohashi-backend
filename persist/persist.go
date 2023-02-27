@@ -2,21 +2,16 @@ package persist
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"robanohashi/persist/keys"
 	"strings"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/nitishm/go-rejson/v4"
+	"github.com/redis/go-redis/v9"
 )
 
 type DB struct {
-	rdb         *redis.Client
-	jsonHandler *rejson.Handler
-}
-
-func (db *DB) JSONHandler() *rejson.Handler {
-	return db.jsonHandler
+	rdb *redis.Client
 }
 
 func (db *DB) Client() *redis.Client {
@@ -30,15 +25,7 @@ func Connect() (*DB, error) {
 		DB:       0,
 	})
 
-	_, err := rdb.Ping(rdb.Context()).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	handler := rejson.NewReJSONHandler()
-	handler.SetGoRedisClient(rdb)
-
-	return &DB{rdb: rdb, jsonHandler: handler}, nil
+	return &DB{rdb: rdb}, nil
 }
 
 func (db *DB) CreateIndices() error {
@@ -76,7 +63,7 @@ func (db *DB) createMeaningMnemonicIndex() error {
 		"ON", "JSON",
 		"PREFIX", "1", "meaning_mnemonic:",
 		"SCHEMA",
-		"$.kanji_id", "AS", "kanji_id", "TAG",
+		"$.subject_id", "AS", "subject_id", "TAG",
 	).Err()
 
 	return err
@@ -97,6 +84,16 @@ func (db *DB) createSubjectIndex() error {
 	).Err()
 
 	return err
+}
+
+func (db *DB) JSONSet(key string, value any) error {
+	data, err := json.Marshal(value)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshal value: %w", err)
+	}
+
+	return db.rdb.Do(context.Background(), "JSON.SET", key, "$", string(data)).Err()
 }
 
 func (db *DB) Close() {

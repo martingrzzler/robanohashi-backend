@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"robanohashi/cmd/import/wanikani"
 	"robanohashi/model"
@@ -29,10 +30,10 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		Text:      createKanjiMeaningMnemonic(wkKanji),
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
-		SubjectID: wkKanji.ID,
+		SubjectID: fmt.Sprintf("%d", wkKanji.ID),
 	}
 
-	_, err = db.JSONHandler().JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
+	err = db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +51,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		VisuallySimilarSubjectIds: wkKanji.Data.VisuallySimilarSubjectIds,
 	}
 
-	_, err = db.JSONHandler().JSONSet(keys.Kanji(wkKanji.ID), "$", kanji)
+	err = db.JSONSet(keys.Kanji(wkKanji.ID), kanji)
 	if err != nil {
 		log.Fatal(err)
 	}

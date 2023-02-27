@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"robanohashi/cmd/import/wanikani"
 	"robanohashi/model"
@@ -31,10 +32,10 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		Text:      wkVocabulary.Data.MeaningMnemonic,
 		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
 		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
-		SubjectID: wkVocabulary.ID,
+		SubjectID: fmt.Sprintf("%d", wkVocabulary.ID),
 	}
 
-	_, err = db.JSONHandler().JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
+	err = db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +52,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		ContextSentences:    createContextSentences(wkVocabulary),
 	}
 
-	_, err = db.JSONHandler().JSONSet(keys.Vocabulary(wkVocabulary.ID), "$", vocabulary)
+	err = db.JSONSet(keys.Vocabulary(wkVocabulary.ID), vocabulary)
 	if err != nil {
 		log.Fatal(err)
 	}
