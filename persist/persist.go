@@ -26,6 +26,12 @@ func Connect() (*DB, error) {
 		DB:       0,
 	})
 
+	err := rdb.Ping(context.Background()).Err()
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &DB{rdb: rdb}, nil
 }
 
