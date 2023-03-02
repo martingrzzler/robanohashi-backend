@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -148,45 +147,4 @@ func fetchCharacterImage(url string) string {
 	}
 
 	return string(bytes)
-}
-
-func fetchHiragana(sentence string) (string, error) {
-	url := "https://api.kuroshiro.org/convert"
-
-	data := map[string]string{
-		"str":  sentence,
-		"to":   "hiragana",
-		"mode": "normal",
-	}
-
-	jsonBody, err := json.Marshal(data)
-
-	if err != nil {
-		return "", err
-	}
-
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	jsonData, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return "", err
-	}
-
-	var result map[string]interface{}
-	err = json.Unmarshal(jsonData, &result)
-
-	if err != nil {
-		return "", err
-	}
-
-	return result["result"].(string), nil
 }
