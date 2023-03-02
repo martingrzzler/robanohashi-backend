@@ -89,8 +89,9 @@ type Vocabulary struct {
 	Characters          string `json:"characters"`
 	ComponentSubjectIds []int  `json:"component_subject_ids"`
 	ContextSentences    []struct {
-		En string `json:"en"`
-		Ja string `json:"ja"`
+		En       string `json:"en"`
+		Ja       string `json:"ja"`
+		Hiragana string `json:"hiragana"`
 	} `json:"context_sentences"`
 	CreatedAt      time.Time   `json:"created_at"`
 	DocumentURL    string      `json:"document_url"`

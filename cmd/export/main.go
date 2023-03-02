@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,8 @@ import (
 	"net/url"
 	"os"
 	"robanohashi/cmd/import/wanikani"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 type Pages struct {
@@ -88,6 +91,7 @@ func createRequest(url string) *http.Request {
 }
 
 func appendPageToFile(data []any, file *os.File) {
+	bar := pb.StartNew(len(data))
 	for _, item := range data {
 		// download character image for radicals
 		if item.(map[string]any)["object"] == "radical" {
@@ -116,7 +120,10 @@ func appendPageToFile(data []any, file *os.File) {
 		if _, err := file.Write([]byte("\n")); err != nil {
 			log.Fatal(err)
 		}
+		bar.Increment()
 	}
+
+	bar.Finish()
 }
 
 func getCharacterImageUrl(subject wanikani.Subject[wanikani.Radical]) string {
@@ -141,4 +148,45 @@ func fetchCharacterImage(url string) string {
 	}
 
 	return string(bytes)
+}
+
+func fetchHiragana(sentence string) (string, error) {
+	url := "https://api.kuroshiro.org/convert"
+
+	data := map[string]string{
+		"str":  sentence,
+		"to":   "hiragana",
+		"mode": "normal",
+	}
+
+	jsonBody, err := json.Marshal(data)
+
+	if err != nil {
+		return "", err
+	}
+
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	jsonData, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	var result map[string]interface{}
+	err = json.Unmarshal(jsonData, &result)
+
+	if err != nil {
+		return "", err
+	}
+
+	return result["result"].(string), nil
 }

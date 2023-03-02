@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+
 	db, err := persist.Connect()
 	if err != nil {
 		log.Fatal(err)
