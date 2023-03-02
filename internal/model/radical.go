@@ -12,6 +12,17 @@ type Radical struct {
 	MeaningMnemonic        string    `json:"meaning_mnemonic"`
 }
 
+type ResolvedRadical struct {
+	ID                   int       `json:"id"`
+	Object               Object    `json:"object"`
+	Slug                 string    `json:"slug"`
+	Characters           string    `json:"characters"`
+	CharacterImage       string    `json:"character_image"`
+	AmalgamationSubjects []Kanji   `json:"amalgamation_subjects"`
+	Meanings             []Meaning `json:"meanings"`
+	MeaningMnemonic      string    `json:"meaning_mnemonic"`
+}
+
 func (r Radical) GetID() int {
 	return r.ID
 }
