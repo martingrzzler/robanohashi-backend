@@ -111,12 +111,12 @@ func (db *DB) SearchSubjects(search string) (any, error) {
 
 	query := ""
 	if len(strings.Split(search, " ")) > 1 {
-		query = fmt.Sprintf("@meaning:(%s)", search)
+		query = fmt.Sprintf("@meaning:(%s*)", search)
 	} else {
-		query = fmt.Sprintf("((@characters:{%s}) => { $weight: 2.0 } | (@meaning:(%s)) | (@reading:{%s}) | (@romaji:{%s}))", search, search, search, search)
+		query = fmt.Sprintf("((@characters:{%s*}) => { $weight: 2.0 } | (@meaning:(%s*)) | (@reading:{%s*}) | (@romaji:{%s*}))", search, search, search, search)
 	}
 
-	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query).Result()
+	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "20").Result()
 }
 
 func (db *DB) JSONGet(ctx context.Context, key string) (any, error) {
