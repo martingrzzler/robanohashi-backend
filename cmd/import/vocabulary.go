@@ -30,8 +30,8 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
 		Text:      wkVocabulary.Data.MeaningMnemonic,
-		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
-		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 		SubjectID: fmt.Sprintf("%d", wkVocabulary.ID),
 	}
 

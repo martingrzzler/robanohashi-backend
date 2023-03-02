@@ -5,23 +5,24 @@ import (
 	"net/http"
 	"robanohashi/internal/dto"
 	"robanohashi/persist"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Search(c *gin.Context) {
-	query := c.Query("query")
+func GetMeaningMnemonics(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
 
-	if query == "" {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "query parameter is required",
+			"error": "id must be an integer",
 		})
 		return
 	}
 
 	db := c.MustGet("db").(*persist.DB)
 
-	res, err := db.SearchSubjects(context.Background(), query)
+	res, err := db.GetMeaningMnemonicsBySubjectID(context.Background(), id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -30,7 +31,7 @@ func Search(c *gin.Context) {
 		return
 	}
 
-	totalCount, subjects, err := dto.ParseFTSearchResult[dto.SubjectPreview](res)
+	totalCount, mnemonics, err := dto.ParseFTSearchResult[dto.MeaningMnemonic](res)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -41,6 +42,6 @@ func Search(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"total_count": totalCount,
-		"data":        subjects,
+		"data":        mnemonics,
 	})
 }

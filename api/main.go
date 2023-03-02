@@ -22,6 +22,7 @@ func main() {
 
 	router.GET("/search", controllers.Search)
 	router.GET("/kanji/:id", controllers.GetKanji)
+	router.GET("/subject/:id/meaning_mnemonics", controllers.GetMeaningMnemonics)
 	router.GET("/radical/:id", controllers.GetRadical)
 	router.GET("/vocabulary/:id", controllers.GetVocabulary)
 	router.Run(":5000")

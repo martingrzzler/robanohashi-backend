@@ -64,8 +64,7 @@ func extractReadings[T model.Reading](rs []T) []string {
 	return readings
 }
 
-// @data json string Kanji, Radical or Vocabulary
-func CreateSubjectPreviewFromRaw(data any) (SubjectPreview, error) {
+func (p SubjectPreview) UnmarshalRaw(data any) (SubjectPreview, error) {
 	s, ok := data.(string)
 	if !ok {
 		return SubjectPreview{}, errors.New("could not convert data to string")

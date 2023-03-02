@@ -19,12 +19,13 @@ type Meaning struct {
 }
 
 type MeaningMnemonic struct {
-	ID   int    `json:"id"`
-	Text string `json:"text"`
+	ID          int    `json:"id"`
+	Text        string `json:"text"`
+	VotingCount int    `json:"voting_count"`
 	// must be string ensure that TAG for the index works as expected
 	SubjectID string `json:"subject_id"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	CreatedAt int64  `json:"created_at"`
+	UpdatedAt int64  `json:"updated_at"`
 }
 
 type Subject interface {

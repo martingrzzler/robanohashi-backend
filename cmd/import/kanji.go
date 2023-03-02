@@ -28,8 +28,8 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
 		Text:      createKanjiMeaningMnemonic(wkKanji),
-		CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
-		UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 		SubjectID: fmt.Sprintf("%d", wkKanji.ID),
 	}
 

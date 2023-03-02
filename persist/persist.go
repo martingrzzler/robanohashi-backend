@@ -107,7 +107,7 @@ func (db *DB) Close() {
 	db.rdb.Close()
 }
 
-func (db *DB) SearchSubjects(search string) (any, error) {
+func (db *DB) SearchSubjects(ctx context.Context, search string) (any, error) {
 
 	query := ""
 	if len(strings.Split(search, " ")) > 1 {
@@ -117,6 +117,12 @@ func (db *DB) SearchSubjects(search string) (any, error) {
 	}
 
 	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "20").Result()
+}
+
+func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (any, error) {
+	query := fmt.Sprintf("@subject_id:{%d}", id)
+
+	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "LIMIT", "0", "20").Result()
 }
 
 func (db *DB) JSONGet(ctx context.Context, key string) (any, error) {
