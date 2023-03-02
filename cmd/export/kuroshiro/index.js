@@ -18,7 +18,10 @@ async function main() {
   readInterface.on("line", async function (line) {
     const subject = JSON.parse(line);
 
-    if (subject.object !== "vocabulary") return;
+    if (subject.object !== "vocabulary") {
+      outputStream.write(JSON.stringify(subject) + "\n");
+      return;
+    }
 
     for (let i = 0; i < subject.data.context_sentences.length; i++) {
       subject.data.context_sentences[i].hiragana = await kuroshiro.convert(
@@ -27,9 +30,9 @@ async function main() {
           to: "hiragana",
         }
       );
-
-      outputStream.write(JSON.stringify(subject) + "\n");
     }
+
+    outputStream.write(JSON.stringify(subject) + "\n");
   });
 
   readInterface.on("close", function () {

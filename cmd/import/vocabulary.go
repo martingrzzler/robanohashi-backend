@@ -62,8 +62,9 @@ func createContextSentences(v *wanikani.Subject[wanikani.Vocabulary]) []model.Co
 	sentences := make([]model.ContextSentence, 0)
 	for _, sentence := range v.Data.ContextSentences {
 		sentences = append(sentences, model.ContextSentence{
-			En: sentence.En,
-			Ja: sentence.Ja,
+			En:       sentence.En,
+			Ja:       sentence.Ja,
+			Hiragana: sentence.Hiragana,
 		})
 	}
 

@@ -62,5 +62,5 @@ func main() {
 		count++
 	}
 
-	fmt.Printf("Successfully imported data %d records", count)
+	fmt.Printf("Successfully imported data %d subjects", count)
 }

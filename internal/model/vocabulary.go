@@ -59,8 +59,9 @@ func (v Vocabulary) GetReadings() []Reading {
 }
 
 type ContextSentence struct {
-	En string `json:"en"`
-	Ja string `json:"ja"`
+	En       string `json:"en"`
+	Ja       string `json:"ja"`
+	Hiragana string `json:"hiragana"`
 }
 
 type VocabularyReading struct {
