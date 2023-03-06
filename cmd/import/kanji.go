@@ -8,23 +8,13 @@ import (
 	"robanohashi/internal/model"
 	"robanohashi/persist"
 	"robanohashi/persist/keys"
-	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[wanikani.Kanji]) {
-	err := db.Client().Incr(ctx, keys.MeaningMnemonicIds()).Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	val, err := db.Client().Get(ctx, keys.MeaningMnemonicIds()).Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, _ := strconv.Atoi(val)
-
+	id := uuid.New().String()
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
 		Text:      createKanjiMeaningMnemonic(wkKanji),
@@ -33,7 +23,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		SubjectID: fmt.Sprintf("%d", wkKanji.ID),
 	}
 
-	err = db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
+	err := db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}

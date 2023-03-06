@@ -40,10 +40,7 @@ func main() {
 	authorized := r.Group("")
 	authorized.Use(ValidateFirebaseToken(auth))
 
-	authorized.GET("/user", func(ctx *gin.Context) {
-		uid := ctx.MustGet("uid").(string)
-		ctx.JSON(http.StatusOK, gin.H{"uid": uid})
-	})
+	authorized.POST("/meaning_mnemonic", controllers.CreateMeaningMnemonic)
 
 	r.GET("/search", controllers.Search)
 	r.GET("/kanji/:id", controllers.GetKanji)

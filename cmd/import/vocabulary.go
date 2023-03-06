@@ -8,24 +8,14 @@ import (
 	"robanohashi/internal/model"
 	"robanohashi/persist"
 	"robanohashi/persist/keys"
-	"strconv"
 	"time"
 
 	"github.com/gojp/kana"
+	"github.com/google/uuid"
 )
 
 func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikani.Subject[wanikani.Vocabulary]) {
-	err := db.Client().Incr(ctx, keys.MeaningMnemonicIds()).Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	val, err := db.Client().Get(ctx, keys.MeaningMnemonicIds()).Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, _ := strconv.Atoi(val)
+	id := uuid.New().String()
 
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
@@ -35,7 +25,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		SubjectID: fmt.Sprintf("%d", wkVocabulary.ID),
 	}
 
-	err = db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
+	err := db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -7,8 +7,8 @@ func MeaningMnemonicIds() string {
 	return "meaning_mnemonic_ids"
 }
 
-func MeaningMnemonic(id int) string {
-	return fmt.Sprintf("meaning_mnemonic:%d", id)
+func MeaningMnemonic(id string) string {
+	return fmt.Sprintf("meaning_mnemonic:%s", id)
 }
 
 func Kanji(id int) string {
