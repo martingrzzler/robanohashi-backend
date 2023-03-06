@@ -41,6 +41,7 @@ func main() {
 	authorized.Use(ValidateFirebaseToken(auth))
 
 	authorized.POST("/meaning_mnemonic", controllers.CreateMeaningMnemonic)
+	authorized.POST("/meaning_mnemonic/vote", controllers.VoteMeaningMnemonic)
 
 	r.GET("/search", controllers.Search)
 	r.GET("/kanji/:id", controllers.GetKanji)

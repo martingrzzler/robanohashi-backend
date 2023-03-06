@@ -17,6 +17,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 	id := uuid.New().String()
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
+		UserID:    string(model.NonHumanUserIDWaniKani),
 		Text:      createKanjiMeaningMnemonic(wkKanji),
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),

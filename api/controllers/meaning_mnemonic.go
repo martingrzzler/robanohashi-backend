@@ -59,3 +59,42 @@ func CreateMeaningMnemonic(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
+
+func VoteMeaningMnemonic(c *gin.Context) {
+	db := c.MustGet("db").(*persist.DB)
+	uid := c.MustGet("uid").(string)
+
+	var body dto.VoteMeaningMnemonic
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if body.Vote != 1 && body.Vote != -1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vote"})
+		return
+	}
+
+	if !db.KeyExists(context.Background(), keys.MeaningMnemonic(body.MeaningMnemonicID)) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "not found"})
+		return
+	}
+
+	switch body.Vote {
+	case 1:
+		status, err := db.UpvoteMeaningMnemonic(context.Background(), body.MeaningMnemonicID, uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": status})
+		return
+	case -1:
+		status, err := db.DownvoteMeaningMnemonic(context.Background(), body.MeaningMnemonicID, uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": status})
+	}
+}

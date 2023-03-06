@@ -340,3 +340,90 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 
 	return resolvedVocab, nil
 }
+
+func (db *DB) KeyExists(ctx context.Context, key string) bool {
+	res, err := db.rdb.Exists(ctx, key).Result()
+	if err != nil {
+		return false
+	}
+
+	return res == 1
+}
+
+var upvoteMnemonicScript = redis.NewScript(`
+local uid = ARGV[1]
+local mnemonicKey = KEYS[1]
+local mnemonicUpvotesKey = KEYS[2]
+local mnemonicDownvotesKey = KEYS[3]
+
+if redis.call("SISMEMBER", mnemonicUpvotesKey, uid) == 1 then
+	redis.call("SREM", mnemonicUpvotesKey, uid)
+	redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", -1)
+	return {ok = "removed upvote"}
+end
+
+if redis.call("SISMEMBER", mnemonicDownvotesKey, uid) == 1 then
+	redis.call("SMOVE", mnemonicDownvotesKey, mnemonicUpvotesKey, uid)
+	redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", 2)
+	return {ok = "switched from downvote to upvote"}
+end
+
+redis.call("SADD", mnemonicUpvotesKey, uid)
+redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", 1)
+
+return {ok = "upvoted"}
+`)
+
+var downvoteMnemonicScript = redis.NewScript(`
+local uid = ARGV[1]
+local mnemonicKey = KEYS[1]
+local mnemonicUpvotesKey = KEYS[2]
+local mnemonicDownvotesKey = KEYS[3]
+
+if redis.call("SISMEMBER", mnemonicDownvotesKey, uid) == 1 then
+	redis.call("SREM", mnemonicDownvotesKey, uid)
+	redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", 1)
+	return {ok = "removed downvote"}
+end
+
+if redis.call("SISMEMBER", mnemonicUpvotesKey , uid) == 1 then
+	redis.call("SMOVE", mnemonicUpvotesKey, mnemonicDownvotesKey, uid)
+	redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", -2)
+	return {ok = "switched from upvote to downvote"}
+end
+
+redis.call("SADD", mnemonicDownvotesKey, uid)
+redis.call("JSON.NUMINCRBY", mnemonicKey, "$.voting_count", -1)
+
+return {ok = "downvoted"}
+`)
+
+func (db *DB) UpvoteMeaningMnemonic(ctx context.Context, mid string, uid string) (string, error) {
+	keys := []string{keys.MeaningMnemonic(mid), keys.MeaningMnemonicUpVoters(mid), keys.MeaningMnemonicDownVoters(mid)}
+	argv := []interface{}{uid}
+
+	status, err := upvoteMnemonicScript.Run(ctx, db.rdb, keys, argv).Result()
+
+	fmt.Println(keys)
+	fmt.Println(argv)
+
+	fmt.Println(status)
+	fmt.Println(err)
+
+	return "ok", err
+}
+
+func (db *DB) DownvoteMeaningMnemonic(ctx context.Context, mid string, uid string) (string, error) {
+	keys := []string{keys.MeaningMnemonic(mid), keys.MeaningMnemonicUpVoters(mid), keys.MeaningMnemonicDownVoters(mid)}
+	argv := []interface{}{uid}
+
+	status, err := downvoteMnemonicScript.Run(ctx, db.rdb, keys, argv).Result()
+
+	fmt.Println(keys)
+	fmt.Println(argv)
+
+	fmt.Println(status)
+	fmt.Println(err)
+
+	return "ok", err
+}

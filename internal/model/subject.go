@@ -18,6 +18,13 @@ type Meaning struct {
 	Primary bool   `json:"primary"`
 }
 
+type NonHumanUserID string
+
+const (
+	NonHumanUserIDWaniKani    NonHumanUserID = "wanikani"
+	NonHumanUserIDAIGenerated NonHumanUserID = "ai_generated"
+)
+
 type MeaningMnemonic struct {
 	ID          string `json:"id"`
 	Text        string `json:"text"`

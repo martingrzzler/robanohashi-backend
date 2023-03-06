@@ -19,6 +19,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 
 	meaningMnemonic := model.MeaningMnemonic{
 		ID:        id,
+		UserID:    string(model.NonHumanUserIDWaniKani),
 		Text:      wkVocabulary.Data.MeaningMnemonic,
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
