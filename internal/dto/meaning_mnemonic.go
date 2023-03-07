@@ -1,6 +1,29 @@
 package dto
 
-import "robanohashi/internal/model"
+import (
+	"encoding/json"
+	"errors"
+	"robanohashi/internal/model"
+)
+
+type MeaningMnemonic struct {
+	model.MeaningMnemonic
+}
+
+func (m MeaningMnemonic) UnmarshalRaw(data any) (MeaningMnemonic, error) {
+	s, ok := data.(string)
+	if !ok {
+		return MeaningMnemonic{}, errors.New("could not convert data to string")
+	}
+
+	mm := MeaningMnemonic{}
+
+	err := json.Unmarshal([]byte(s), &mm)
+	if err != nil {
+		return MeaningMnemonic{}, err
+	}
+	return mm, nil
+}
 
 type CreateMeaningMnemonic struct {
 	Text      string       `json:"text" binding:"required"`
@@ -11,4 +34,10 @@ type CreateMeaningMnemonic struct {
 type VoteMeaningMnemonic struct {
 	Vote              int    `json:"vote" binding:"required"`
 	MeaningMnemonicID string `json:"meaning_mnemonic_id" binding:"required"`
+}
+
+type MeaningMnemonicWithUserInfo struct {
+	MeaningMnemonic
+	Upvoted   bool `json:"upvoted"`
+	Downvoted bool `json:"downvoted"`
 }

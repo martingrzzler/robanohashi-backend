@@ -38,10 +38,12 @@ func main() {
 	}
 
 	authorized := r.Group("")
-	authorized.Use(ValidateFirebaseToken(auth))
+	authorized.Use(ValidateFirebaseToken(auth, true))
 
 	authorized.POST("/meaning_mnemonic", controllers.CreateMeaningMnemonic)
 	authorized.POST("/meaning_mnemonic/vote", controllers.VoteMeaningMnemonic)
+
+	r.Use(ValidateFirebaseToken(auth, false))
 
 	r.GET("/search", controllers.Search)
 	r.GET("/kanji/:id", controllers.GetKanji)
@@ -51,13 +53,16 @@ func main() {
 	r.Run(":5000")
 }
 
-func ValidateFirebaseToken(auth *auth.Client) gin.HandlerFunc {
+func ValidateFirebaseToken(auth *auth.Client, abortOnError bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		bearer := c.GetHeader("Authorization")
 
-		if bearer == "" {
+		if bearer == "" && abortOnError {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthenticated"})
+			return
+		} else if bearer == "" && !abortOnError {
+			c.Next()
 			return
 		}
 
@@ -72,5 +77,6 @@ func ValidateFirebaseToken(auth *auth.Client) gin.HandlerFunc {
 		uid := token.UID
 
 		c.Set("uid", uid)
+		c.Next()
 	}
 }

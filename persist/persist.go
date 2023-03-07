@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
 	"strings"
@@ -71,6 +72,7 @@ func (db *DB) createMeaningMnemonicIndex() error {
 		"PREFIX", "1", "meaning_mnemonic:",
 		"SCHEMA",
 		"$.subject_id", "AS", "subject_id", "TAG",
+		"$.voting_count", "AS", "voting_count", "NUMERIC", "SORTABLE",
 	).Err()
 
 	return err
@@ -122,7 +124,7 @@ func (db *DB) SearchSubjects(ctx context.Context, search string) (any, error) {
 func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (any, error) {
 	query := fmt.Sprintf("@subject_id:{%d}", id)
 
-	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "LIMIT", "0", "20").Result()
+	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "SORTBY", "voting_count", "DESC", "LIMIT", "0", "100", "RETURN", "1", "$").Result()
 }
 
 func (db *DB) JSONGet(ctx context.Context, key string) (any, error) {
@@ -404,13 +406,11 @@ func (db *DB) UpvoteMeaningMnemonic(ctx context.Context, mid string, uid string)
 
 	status, err := upvoteMnemonicScript.Run(ctx, db.rdb, keys, argv).Result()
 
-	fmt.Println(keys)
-	fmt.Println(argv)
+	if err != nil {
+		return "", err
+	}
 
-	fmt.Println(status)
-	fmt.Println(err)
-
-	return "ok", err
+	return status.(string), err
 }
 
 func (db *DB) DownvoteMeaningMnemonic(ctx context.Context, mid string, uid string) (string, error) {
@@ -419,11 +419,36 @@ func (db *DB) DownvoteMeaningMnemonic(ctx context.Context, mid string, uid strin
 
 	status, err := downvoteMnemonicScript.Run(ctx, db.rdb, keys, argv).Result()
 
-	fmt.Println(keys)
-	fmt.Println(argv)
+	if err != nil {
+		return "", err
+	}
 
-	fmt.Println(status)
-	fmt.Println(err)
+	return status.(string), err
+}
 
-	return "ok", err
+func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
+	pipe := db.rdb.Pipeline()
+
+	for _, mnemonic := range mnemonics {
+		pipe.SIsMember(ctx, keys.MeaningMnemonicUpVoters(mnemonic.ID), uid)
+		pipe.SIsMember(ctx, keys.MeaningMnemonicDownVoters(mnemonic.ID), uid)
+	}
+
+	res, err := pipe.Exec(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute pipeline: %w", err)
+	}
+
+	votes := make([]dto.MeaningMnemonicWithUserInfo, len(mnemonics))
+
+	for i, mnemonic := range mnemonics {
+		votes[i] = dto.MeaningMnemonicWithUserInfo{
+			MeaningMnemonic: mnemonic,
+			Upvoted:         res[i*2].(*redis.BoolCmd).Val(),
+			Downvoted:       res[i*2+1].(*redis.BoolCmd).Val(),
+		}
+	}
+
+	return votes, nil
 }

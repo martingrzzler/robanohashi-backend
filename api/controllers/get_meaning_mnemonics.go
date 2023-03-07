@@ -40,8 +40,29 @@ func GetMeaningMnemonics(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
+	_, exists := c.Get("uid")
+
+	if !exists {
+		c.JSON(http.StatusOK, gin.H{
+			"total_count": totalCount,
+			"data":        mnemonics,
+		})
+		return
+	}
+
+	uid := c.MustGet("uid").(string)
+
+	mnemonicsWithVotes, err := db.ResolveUserVotes(context.Background(), uid, mnemonics)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
 		"total_count": totalCount,
-		"data":        mnemonics,
+		"data":        mnemonicsWithVotes,
 	})
 }
