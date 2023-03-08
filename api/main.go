@@ -44,6 +44,7 @@ func main() {
 	authorized.PUT("/meaning_mnemonic", controllers.UpdateMeaningMnemonic)
 	authorized.DELETE("/meaning_mnemonic", controllers.DeleteMeaningMnemonic)
 	authorized.POST("/meaning_mnemonic/vote", controllers.VoteMeaningMnemonic)
+	authorized.POST("/meaning_mnemonic/toggle_favorite", controllers.ToggleFavoriteMeaningMnemonic)
 
 	r.Use(ValidateFirebaseToken(auth, false))
 

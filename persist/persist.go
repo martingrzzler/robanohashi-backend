@@ -84,3 +84,29 @@ func (db *DB) KeyExists(ctx context.Context, key string) bool {
 
 	return res == 1
 }
+
+var toggleScript = redis.NewScript(`
+local value = ARGV[1]
+local key = KEYS[1]
+
+if redis.call("SADD", key, value) == 1 then
+	return {ok = "added"}
+end
+
+redis.call("SREM", key, value)
+
+return {ok = "removed"}
+`)
+
+func (db *DB) toggleSetValue(ctx context.Context, key string, value string) (string, error) {
+	keys := []string{key}
+	argv := []interface{}{value}
+
+	status, err := toggleScript.Run(ctx, db.rdb, keys, argv).Result()
+
+	if err != nil {
+		return "", fmt.Errorf("could not toggle value: %w", err)
+	}
+
+	return status.(string), err
+}

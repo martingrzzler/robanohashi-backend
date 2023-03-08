@@ -50,3 +50,7 @@ type UpdateMeaningMnemonic struct {
 type DeleteMeaningMnemonic struct {
 	ID string `json:"id" binding:"required"`
 }
+
+type ToggleFavoriteMeaningMnemonic struct {
+	ID string `json:"id" binding:"required"`
+}

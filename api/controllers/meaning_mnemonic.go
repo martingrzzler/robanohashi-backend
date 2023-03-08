@@ -76,7 +76,7 @@ func VoteMeaningMnemonic(c *gin.Context) {
 	}
 
 	if !db.KeyExists(context.Background(), keys.MeaningMnemonic(body.MeaningMnemonicID)) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
 
@@ -99,6 +99,37 @@ func VoteMeaningMnemonic(c *gin.Context) {
 	}
 }
 
+func ToggleFavoriteMeaningMnemonic(c *gin.Context) {
+	db := c.MustGet("db").(*persist.DB)
+	uid := c.MustGet("uid").(string)
+
+	var body dto.ToggleFavoriteMeaningMnemonic
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	mm, err := db.GetMeaningMnemonic(context.Background(), body.ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+
+	if mm.UserID != uid {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
+
+	status, err := db.ToggleFavoriteMeaningMnemonic(context.Background(), body.ID, uid)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": status})
+}
+
 func UpdateMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -111,7 +142,7 @@ func UpdateMeaningMnemonic(c *gin.Context) {
 
 	mm, err := db.GetMeaningMnemonic(context.Background(), body.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
 

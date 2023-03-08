@@ -86,6 +86,10 @@ func (db *DB) DownvoteMeaningMnemonic(ctx context.Context, mid string, uid strin
 	return status.(string), err
 }
 
+func (db *DB) ToggleFavoriteMeaningMnemonic(ctx context.Context, mid string, uid string) (string, error) {
+	return db.toggleSetValue(ctx, keys.MeaningMnemonicFavorites(mid), uid)
+}
+
 func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
 	pipe := db.rdb.Pipeline()
 
