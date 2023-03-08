@@ -41,3 +41,12 @@ type MeaningMnemonicWithUserInfo struct {
 	Upvoted   bool `json:"upvoted"`
 	Downvoted bool `json:"downvoted"`
 }
+
+type UpdateMeaningMnemonic struct {
+	ID   string `json:"id" binding:"required"`
+	Text string `json:"text" binding:"required"`
+}
+
+type DeleteMeaningMnemonic struct {
+	ID string `json:"id" binding:"required"`
+}

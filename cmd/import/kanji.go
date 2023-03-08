@@ -24,7 +24,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		SubjectID: fmt.Sprintf("%d", wkKanji.ID),
 	}
 
-	err := db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
+	err := db.JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		VisuallySimilarSubjectIds: wkKanji.Data.VisuallySimilarSubjectIds,
 	}
 
-	err = db.JSONSet(keys.Kanji(wkKanji.ID), kanji)
+	err = db.JSONSet(keys.Kanji(wkKanji.ID), "$", kanji)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -34,14 +34,14 @@ func Connect() (*DB, error) {
 	return &DB{rdb: rdb}, nil
 }
 
-func (db *DB) JSONSet(key string, value any) error {
+func (db *DB) JSONSet(key string, path string, value any) error {
 	data, err := json.Marshal(value)
 
 	if err != nil {
 		return fmt.Errorf("failed to marshal value: %w", err)
 	}
 
-	return db.rdb.Do(context.Background(), "JSON.SET", key, "$", string(data)).Err()
+	return db.rdb.Do(context.Background(), "JSON.SET", key, path, string(data)).Err()
 }
 
 func (db *DB) Close() {

@@ -2,9 +2,12 @@ package persist
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"robanohashi/internal/dto"
+	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -108,4 +111,46 @@ func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.
 	}
 
 	return votes, nil
+}
+
+func (db *DB) GetMeaningMnemonic(ctx context.Context, id string) (*model.MeaningMnemonic, error) {
+	data, err := db.JSONGet(ctx, keys.MeaningMnemonic(id))
+
+	if err != nil {
+		return nil, err
+	}
+	mm := &model.MeaningMnemonic{}
+
+	err = json.Unmarshal([]byte(data.(string)), mm)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal meaning mnemonic: %w", err)
+	}
+
+	return mm, nil
+}
+
+func (db *DB) UpdateMeaningMnemonic(ctx context.Context, umm dto.UpdateMeaningMnemonic) error {
+	tx := db.rdb.TxPipeline()
+
+	tx.Do(ctx, "JSON.SET", keys.MeaningMnemonic(umm.ID), "$.text", umm.Text)
+	tx.Do(ctx, "JSON.SET", keys.MeaningMnemonic(umm.ID), "$.updated_at", time.Now().Unix())
+
+	_, err := tx.Exec(ctx)
+
+	if err != nil {
+		return fmt.Errorf("failed to execute transaction: %w", err)
+	}
+
+	return nil
+}
+
+func (db *DB) DeleteMeaningMnemonic(ctx context.Context, id string) error {
+	err := db.rdb.Do(ctx, "JSON.DEL", keys.MeaningMnemonic(id)).Err()
+
+	if err != nil {
+		return fmt.Errorf("failed to delete meaning mnemonic: %w", err)
+	}
+
+	return nil
 }

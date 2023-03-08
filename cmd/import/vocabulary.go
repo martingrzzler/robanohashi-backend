@@ -26,7 +26,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		SubjectID: fmt.Sprintf("%d", wkVocabulary.ID),
 	}
 
-	err := db.JSONSet(keys.MeaningMnemonic(id), meaningMnemonic)
+	err := db.JSONSet(keys.MeaningMnemonic(id), "$", meaningMnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		ContextSentences:    createContextSentences(wkVocabulary),
 	}
 
-	err = db.JSONSet(keys.Vocabulary(wkVocabulary.ID), vocabulary)
+	err = db.JSONSet(keys.Vocabulary(wkVocabulary.ID), "$", vocabulary)
 	if err != nil {
 		log.Fatal(err)
 	}
