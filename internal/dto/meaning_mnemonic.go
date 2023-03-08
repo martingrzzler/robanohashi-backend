@@ -40,6 +40,7 @@ type MeaningMnemonicWithUserInfo struct {
 	MeaningMnemonic
 	Upvoted   bool `json:"upvoted"`
 	Downvoted bool `json:"downvoted"`
+	Favorite  bool `json:"favorite"`
 }
 
 type UpdateMeaningMnemonic struct {

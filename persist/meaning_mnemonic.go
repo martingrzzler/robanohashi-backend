@@ -96,6 +96,7 @@ func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.
 	for _, mnemonic := range mnemonics {
 		pipe.SIsMember(ctx, keys.MeaningMnemonicUpVoters(mnemonic.ID), uid)
 		pipe.SIsMember(ctx, keys.MeaningMnemonicDownVoters(mnemonic.ID), uid)
+		pipe.SIsMember(ctx, keys.MeaningMnemonicFavorites(mnemonic.ID), uid)
 	}
 
 	res, err := pipe.Exec(ctx)
@@ -109,8 +110,9 @@ func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.
 	for i, mnemonic := range mnemonics {
 		votes[i] = dto.MeaningMnemonicWithUserInfo{
 			MeaningMnemonic: mnemonic,
-			Upvoted:         res[i*2].(*redis.BoolCmd).Val(),
-			Downvoted:       res[i*2+1].(*redis.BoolCmd).Val(),
+			Upvoted:         res[i*3].(*redis.BoolCmd).Val(),
+			Downvoted:       res[i*3+1].(*redis.BoolCmd).Val(),
+			Favorite:        res[i*3+2].(*redis.BoolCmd).Val(),
 		}
 	}
 
