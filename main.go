@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"robanohashi/api/controllers"
+	"robanohashi/internal/dto"
 	"robanohashi/persist"
 	"strings"
 
@@ -12,14 +13,26 @@ import (
 	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "robanohashi/docs"
 )
 
+// @title Roba no hashi API
+// @description Query Kanji, Vocabulary, and Radicals with Mnemonics
+// @version 1.0.0
+// @host robanohashi.org
+
 func main() {
+
 	db, err := persist.Connect()
 	if err != nil {
 		log.Fatal("Failed to connect to Redis:", err)
 	}
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Use(func(c *gin.Context) {
 		c.Set("db", db)
@@ -62,7 +75,7 @@ func ValidateFirebaseToken(auth *auth.Client, abortOnError bool) gin.HandlerFunc
 		bearer := c.GetHeader("Authorization")
 
 		if bearer == "" && abortOnError {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthenticated"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "unauthenticated"})
 			return
 		} else if bearer == "" && !abortOnError {
 			c.Next()
@@ -73,7 +86,7 @@ func ValidateFirebaseToken(auth *auth.Client, abortOnError bool) gin.HandlerFunc
 
 		token, err := auth.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthenticated"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "unauthenticated"})
 			return
 		}
 

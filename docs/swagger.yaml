@@ -1,0 +1,184 @@
+definitions:
+  dto.CreateMeaningMnemonic:
+    properties:
+      object:
+        $ref: '#/definitions/model.Object'
+      subject_id:
+        type: integer
+      text:
+        type: string
+    required:
+    - object
+    - subject_id
+    - text
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.Kanji:
+    properties:
+      amalgamation_subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+      characters:
+        type: string
+      component_subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+      id:
+        type: integer
+      meanings:
+        items:
+          $ref: '#/definitions/model.Meaning'
+        type: array
+      object:
+        $ref: '#/definitions/model.Object'
+      reading_mnemonic:
+        type: string
+      readings:
+        items:
+          $ref: '#/definitions/model.KanjiReading'
+        type: array
+      slug:
+        type: string
+      visually_similar_subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+    type: object
+  dto.MeaningMnemonic:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: string
+      subject_id:
+        description: must be string ensure that TAG for the index works as expected
+        type: string
+      text:
+        type: string
+      updated_at:
+        type: integer
+      user_id:
+        type: string
+      voting_count:
+        type: integer
+    type: object
+  dto.SubjectPreview:
+    properties:
+      character_image:
+        type: string
+      characters:
+        type: string
+      id:
+        type: integer
+      meanings:
+        items:
+          type: string
+        type: array
+      object:
+        $ref: '#/definitions/model.Object'
+      readings:
+        items:
+          type: string
+        type: array
+      slug:
+        type: string
+    type: object
+  model.KanjiReading:
+    properties:
+      primary:
+        type: boolean
+      reading:
+        type: string
+      type:
+        type: string
+    type: object
+  model.Meaning:
+    properties:
+      meaning:
+        type: string
+      primary:
+        type: boolean
+    type: object
+  model.Object:
+    enum:
+    - kanji
+    - radical
+    - vocabulary
+    type: string
+    x-enum-varnames:
+    - ObjectKanji
+    - ObjectRadical
+    - ObjectVocabulary
+host: robanohashi.org
+info:
+  contact: {}
+  description: Query Kanji, Vocabulary, and Radicals with Mnemonics
+  title: Roba no hashi API
+  version: 1.0.0
+paths:
+  /kanji/{id}:
+    get:
+      parameters:
+      - description: Kanji ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Kanji'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: get a kanji
+      tags:
+      - Subject
+  /meaning_mnemonic:
+    post:
+      parameters:
+      - description: Meaning mnemonic
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMeaningMnemonic'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.MeaningMnemonic'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - firebase: []
+      summary: create a meaning mnemonic for a kanji or vocabulary
+      tags:
+      - Meaning-Mnemonic
+swagger: "2.0"

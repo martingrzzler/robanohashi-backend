@@ -1,5 +1,9 @@
 package dto
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 type RawUnmarshaler[T any] interface {
 	UnmarshalRaw(data any) (T, error)
 }
