@@ -113,6 +113,7 @@ func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.
 			Upvoted:         res[i*3].(*redis.BoolCmd).Val(),
 			Downvoted:       res[i*3+1].(*redis.BoolCmd).Val(),
 			Favorite:        res[i*3+2].(*redis.BoolCmd).Val(),
+			Me:              mnemonic.UserID == uid,
 		}
 	}
 
@@ -139,7 +140,7 @@ func (db *DB) GetMeaningMnemonic(ctx context.Context, id string) (*model.Meaning
 func (db *DB) UpdateMeaningMnemonic(ctx context.Context, umm dto.UpdateMeaningMnemonic) error {
 	tx := db.rdb.TxPipeline()
 
-	tx.Do(ctx, "JSON.SET", keys.MeaningMnemonic(umm.ID), "$.text", umm.Text)
+	tx.Do(ctx, "JSON.SET", keys.MeaningMnemonic(umm.ID), "$.text", fmt.Sprintf("\"%s\"", umm.Text))
 	tx.Do(ctx, "JSON.SET", keys.MeaningMnemonic(umm.ID), "$.updated_at", time.Now().Unix())
 
 	_, err := tx.Exec(ctx)

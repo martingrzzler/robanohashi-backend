@@ -109,14 +109,8 @@ func ToggleFavoriteMeaningMnemonic(c *gin.Context) {
 		return
 	}
 
-	mm, err := db.GetMeaningMnemonic(context.Background(), body.ID)
-	if err != nil {
+	if !db.KeyExists(context.Background(), keys.MeaningMnemonic(body.ID)) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
-		return
-	}
-
-	if mm.UserID != uid {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
