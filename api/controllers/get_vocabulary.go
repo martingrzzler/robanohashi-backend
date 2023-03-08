@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @tags Subject
+// @summary get a vocabulary
+// @produce json
+// @router /vocabulary/{id} [get]
+// @success 200 {object} dto.Vocabulary
+// @failure 404 {object} dto.ErrorResponse
+// @failure 500 {object} dto.ErrorResponse
+// @failure 400 {object} dto.ErrorResponse
+// @param id path int true "Vocabulary ID"
 func GetVocabulary(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "id must be an integer",
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "id must be an integer",
 		})
 		return
 	}
@@ -25,8 +34,8 @@ func GetVocabulary(c *gin.Context) {
 	vocabulary, err := db.GetVocabulary(context.Background(), id)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "vocabulary not found",
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Error: "vocabulary not found",
 		})
 		return
 	}
@@ -34,8 +43,8 @@ func GetVocabulary(c *gin.Context) {
 	resolved, err := db.GetVocabularyResolved(context.Background(), vocabulary)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to resolve vocabulary",
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "failed to resolve vocabulary",
 		})
 
 		return

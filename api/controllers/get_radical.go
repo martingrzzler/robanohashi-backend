@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @tags Subject
+// @summary get a radical
+// @produce json
+// @router /radical/{id} [get]
+// @success 200 {object} dto.Radical
+// @failure 404 {object} dto.ErrorResponse
+// @failure 500 {object} dto.ErrorResponse
+// @failure 400 {object} dto.ErrorResponse
+// @param id path int true "Radical ID"
 func GetRadical(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "id must be an integer",
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "id must be an integer",
 		})
 		return
 	}
@@ -25,8 +34,8 @@ func GetRadical(c *gin.Context) {
 	radical, err := db.GetRadical(context.Background(), id)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "radical not found",
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Error: "radical not found",
 		})
 		return
 	}
@@ -34,8 +43,8 @@ func GetRadical(c *gin.Context) {
 	resolved, err := db.GetRadicalResolved(context.Background(), radical)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to resolve radical",
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "failed to resolve radical",
 		})
 
 		return

@@ -24,6 +24,9 @@ import (
 // @description Query Kanji, Vocabulary, and Radicals with Mnemonics
 // @version 1.0.0
 // @host robanohashi.org
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
 
 func main() {
 

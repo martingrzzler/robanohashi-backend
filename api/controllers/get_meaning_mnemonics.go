@@ -10,12 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @tags Subject
+// @summary get meaning mnemonics optionally with user data if authenticated
+// @produce json
+// @router /subject/{id}/meaning_mnemonics [get]
+// @success 200 {object} dto.ListResponse[dto.MeaningMnemonicWithUserInfo]
+// @failure 500 {object} dto.ErrorResponse
+// @failure 400 {object} dto.ErrorResponse
+// @param id path int true "Subject ID vocabulary or kanji"
 func GetMeaningMnemonics(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "id must be an integer",
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "id must be an integer",
 		})
 		return
 	}
@@ -25,8 +33,8 @@ func GetMeaningMnemonics(c *gin.Context) {
 	res, err := db.GetMeaningMnemonicsBySubjectID(context.Background(), id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong",
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "Something went wrong",
 		})
 		return
 	}
@@ -34,8 +42,8 @@ func GetMeaningMnemonics(c *gin.Context) {
 	totalCount, mnemonics, err := dto.ParseFTSearchResult[dto.MeaningMnemonic](res)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
@@ -43,9 +51,9 @@ func GetMeaningMnemonics(c *gin.Context) {
 	_, exists := c.Get("uid")
 
 	if !exists {
-		c.JSON(http.StatusOK, gin.H{
-			"total_count": totalCount,
-			"data":        mnemonics,
+		c.JSON(http.StatusOK, dto.ListResponse[dto.MeaningMnemonic]{
+			TotalCount: totalCount,
+			Data:       mnemonics,
 		})
 		return
 	}
@@ -55,14 +63,14 @@ func GetMeaningMnemonics(c *gin.Context) {
 	mnemonicsWithVotes, err := db.ResolveUserVotes(context.Background(), uid, mnemonics)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"total_count": totalCount,
-		"data":        mnemonicsWithVotes,
+	c.JSON(http.StatusOK, dto.ListResponse[dto.MeaningMnemonicWithUserInfo]{
+		TotalCount: totalCount,
+		Data:       mnemonicsWithVotes,
 	})
 }

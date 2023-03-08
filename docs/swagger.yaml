@@ -12,6 +12,13 @@ definitions:
     - subject_id
     - text
     type: object
+  dto.DeleteMeaningMnemonic:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
   dto.ErrorResponse:
     properties:
       error:
@@ -50,6 +57,24 @@ definitions:
           $ref: '#/definitions/dto.SubjectPreview'
         type: array
     type: object
+  dto.ListResponse-dto_MeaningMnemonicWithUserInfo:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.MeaningMnemonicWithUserInfo'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  dto.ListResponse-dto_SubjectPreview:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+      total_count:
+        type: integer
+    type: object
   dto.MeaningMnemonic:
     properties:
       created_at:
@@ -67,6 +92,60 @@ definitions:
         type: string
       voting_count:
         type: integer
+    type: object
+  dto.MeaningMnemonicWithUserInfo:
+    properties:
+      created_at:
+        type: integer
+      downvoted:
+        type: boolean
+      favorite:
+        type: boolean
+      id:
+        type: string
+      me:
+        type: boolean
+      subject_id:
+        description: must be string ensure that TAG for the index works as expected
+        type: string
+      text:
+        type: string
+      updated_at:
+        type: integer
+      upvoted:
+        type: boolean
+      user_id:
+        type: string
+      voting_count:
+        type: integer
+    type: object
+  dto.Radical:
+    properties:
+      amalgamation_subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+      character_image:
+        type: string
+      characters:
+        type: string
+      id:
+        type: integer
+      meaning_mnemonic:
+        type: string
+      meanings:
+        items:
+          $ref: '#/definitions/model.Meaning'
+        type: array
+      object:
+        $ref: '#/definitions/model.Object'
+      slug:
+        type: string
+    type: object
+  dto.StatusResponse:
+    properties:
+      status:
+        type: string
     type: object
   dto.SubjectPreview:
     properties:
@@ -87,6 +166,71 @@ definitions:
           type: string
         type: array
       slug:
+        type: string
+    type: object
+  dto.ToggleFavoriteMeaningMnemonic:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  dto.UpdateMeaningMnemonic:
+    properties:
+      id:
+        type: string
+      text:
+        type: string
+    required:
+    - id
+    - text
+    type: object
+  dto.Vocabulary:
+    properties:
+      characters:
+        type: string
+      component_subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectPreview'
+        type: array
+      context_sentences:
+        items:
+          $ref: '#/definitions/model.ContextSentence'
+        type: array
+      id:
+        type: integer
+      meanings:
+        items:
+          $ref: '#/definitions/model.Meaning'
+        type: array
+      object:
+        $ref: '#/definitions/model.Object'
+      reading_mnemonic:
+        type: string
+      readings:
+        items:
+          $ref: '#/definitions/model.VocabularyReading'
+        type: array
+      slug:
+        type: string
+    type: object
+  dto.VoteMeaningMnemonic:
+    properties:
+      meaning_mnemonic_id:
+        type: string
+      vote:
+        type: integer
+    required:
+    - meaning_mnemonic_id
+    - vote
+    type: object
+  model.ContextSentence:
+    properties:
+      en:
+        type: string
+      hiragana:
+        type: string
+      ja:
         type: string
     type: object
   model.KanjiReading:
@@ -115,6 +259,15 @@ definitions:
     - ObjectKanji
     - ObjectRadical
     - ObjectVocabulary
+  model.VocabularyReading:
+    properties:
+      primary:
+        type: boolean
+      reading:
+        type: string
+      romaji:
+        type: string
+    type: object
 host: robanohashi.org
 info:
   contact: {}
@@ -153,6 +306,42 @@ paths:
       tags:
       - Subject
   /meaning_mnemonic:
+    delete:
+      parameters:
+      - description: mnemonic id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteMeaningMnemonic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: delete a meaning mnemonic
+      tags:
+      - Meaning-Mnemonic
     post:
       parameters:
       - description: Meaning mnemonic
@@ -177,8 +366,223 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
-      - firebase: []
+      - Bearer: []
       summary: create a meaning mnemonic for a kanji or vocabulary
       tags:
       - Meaning-Mnemonic
+    put:
+      parameters:
+      - description: mnemonic id + text
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMeaningMnemonic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: update the meaning mnemonic text
+      tags:
+      - Meaning-Mnemonic
+  /meaning_mnemonic/toggle_favorite:
+    post:
+      parameters:
+      - description: mnemonic id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ToggleFavoriteMeaningMnemonic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: toggle favorite on a meaning mnemonic
+      tags:
+      - Meaning-Mnemonic
+  /meaning_mnemonic/vote:
+    post:
+      parameters:
+      - description: vote can be 1 or -1
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VoteMeaningMnemonic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: vote on a meaning mnemonic
+      tags:
+      - Meaning-Mnemonic
+  /radical/{id}:
+    get:
+      parameters:
+      - description: Radical ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Radical'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: get a radical
+      tags:
+      - Subject
+  /search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ListResponse-dto_SubjectPreview'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: search for subjects
+      tags:
+      - Search
+  /subject/{id}/meaning_mnemonics:
+    get:
+      parameters:
+      - description: Subject ID vocabulary or kanji
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ListResponse-dto_MeaningMnemonicWithUserInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: get meaning mnemonics optionally with user data if authenticated
+      tags:
+      - Subject
+  /vocabulary/{id}:
+    get:
+      parameters:
+      - description: Vocabulary ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Vocabulary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: get a vocabulary
+      tags:
+      - Subject
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

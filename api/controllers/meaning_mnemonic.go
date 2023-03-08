@@ -22,7 +22,7 @@ import (
 // @failure 400 {object} dto.ErrorResponse
 // @failure 500 {object} dto.ErrorResponse
 // @param request body dto.CreateMeaningMnemonic true "Meaning mnemonic"
-// @security firebase
+// @security Bearer
 func CreateMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -66,9 +66,19 @@ func CreateMeaningMnemonic(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, dto.CreatedResponse{ID: id})
 }
 
+// @tags Meaning-Mnemonic
+// @summary vote on a meaning mnemonic
+// @produce json
+// @router /meaning_mnemonic/vote [post]
+// @success 200 {object} dto.StatusResponse
+// @failure 400 {object} dto.ErrorResponse
+// @failure 500 {object} dto.ErrorResponse
+// @failure 404 {object} dto.ErrorResponse
+// @param request body dto.VoteMeaningMnemonic true "vote can be 1 or -1"
+// @security Bearer
 func VoteMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -96,7 +106,7 @@ func VoteMeaningMnemonic(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"status": status})
+		c.JSON(http.StatusOK, dto.StatusResponse{Status: status})
 		return
 	case -1:
 		status, err := db.DownvoteMeaningMnemonic(context.Background(), body.MeaningMnemonicID, uid)
@@ -104,10 +114,20 @@ func VoteMeaningMnemonic(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"status": status})
+		c.JSON(http.StatusOK, dto.StatusResponse{Status: status})
 	}
 }
 
+// @tags Meaning-Mnemonic
+// @summary toggle favorite on a meaning mnemonic
+// @produce json
+// @router /meaning_mnemonic/toggle_favorite [post]
+// @success 200 {object} dto.StatusResponse
+// @failure 400 {object} dto.ErrorResponse
+// @failure 404 {object} dto.ErrorResponse
+// @failure 500 {object} dto.ErrorResponse
+// @param request body dto.ToggleFavoriteMeaningMnemonic true "mnemonic id"
+// @security Bearer
 func ToggleFavoriteMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -130,9 +150,19 @@ func ToggleFavoriteMeaningMnemonic(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": status})
+	c.JSON(http.StatusOK, dto.StatusResponse{Status: status})
 }
 
+// @tags Meaning-Mnemonic
+// @summary update the meaning mnemonic text
+// @produce json
+// @router /meaning_mnemonic [put]
+// @success 200 {object} dto.StatusResponse
+// @failure 400 {object} dto.ErrorResponse
+// @failure 404 {object} dto.ErrorResponse
+// @failure 403 {object} dto.ErrorResponse
+// @param request body dto.UpdateMeaningMnemonic true "mnemonic id + text"
+// @security Bearer
 func UpdateMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -159,9 +189,20 @@ func UpdateMeaningMnemonic(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	c.JSON(http.StatusOK, dto.StatusResponse{Status: "ok"})
 }
 
+// @tags Meaning-Mnemonic
+// @summary delete a meaning mnemonic
+// @produce json
+// @router /meaning_mnemonic [delete]
+// @success 200 {object} dto.StatusResponse
+// @failure 400 {object} dto.ErrorResponse
+// @failure 404 {object} dto.ErrorResponse
+// @failure 403 {object} dto.ErrorResponse
+// @failure 500 {object} dto.ErrorResponse
+// @security Bearer
+// @param request body dto.DeleteMeaningMnemonic true "mnemonic id"
 func DeleteMeaningMnemonic(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)
@@ -175,7 +216,7 @@ func DeleteMeaningMnemonic(c *gin.Context) {
 
 	mm, err := db.GetMeaningMnemonic(context.Background(), body.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "not found"})
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "not found"})
 		return
 	}
 
@@ -189,5 +230,5 @@ func DeleteMeaningMnemonic(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	c.JSON(http.StatusOK, dto.StatusResponse{Status: "ok"})
 }

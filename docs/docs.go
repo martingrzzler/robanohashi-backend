@@ -62,10 +62,61 @@ const docTemplate = `{
             }
         },
         "/meaning_mnemonic": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "update the meaning mnemonic text",
+                "parameters": [
+                    {
+                        "description": "mnemonic id + text",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateMeaningMnemonic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
-                        "firebase": []
+                        "Bearer": []
                     }
                 ],
                 "produces": [
@@ -106,6 +157,341 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "delete a meaning mnemonic",
+                "parameters": [
+                    {
+                        "description": "mnemonic id",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteMeaningMnemonic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/meaning_mnemonic/toggle_favorite": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "toggle favorite on a meaning mnemonic",
+                "parameters": [
+                    {
+                        "description": "mnemonic id",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ToggleFavoriteMeaningMnemonic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/meaning_mnemonic/vote": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "vote on a meaning mnemonic",
+                "parameters": [
+                    {
+                        "description": "vote can be 1 or -1",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.VoteMeaningMnemonic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/radical/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "summary": "get a radical",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Radical ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Radical"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/search": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "search for subjects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListResponse-dto_SubjectPreview"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/subject/{id}/meaning_mnemonics": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "summary": "get meaning mnemonics optionally with user data if authenticated",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Subject ID vocabulary or kanji",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListResponse-dto_MeaningMnemonicWithUserInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vocabulary/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "summary": "get a vocabulary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Vocabulary ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Vocabulary"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
@@ -125,6 +511,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeleteMeaningMnemonic": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }
@@ -187,6 +584,34 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ListResponse-dto_MeaningMnemonicWithUserInfo": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MeaningMnemonicWithUserInfo"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ListResponse-dto_SubjectPreview": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SubjectPreview"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.MeaningMnemonic": {
             "type": "object",
             "properties": {
@@ -211,6 +636,88 @@ const docTemplate = `{
                 },
                 "voting_count": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.MeaningMnemonicWithUserInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "downvoted": {
+                    "type": "boolean"
+                },
+                "favorite": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "me": {
+                    "type": "boolean"
+                },
+                "subject_id": {
+                    "description": "must be string ensure that TAG for the index works as expected",
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                },
+                "upvoted": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "voting_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Radical": {
+            "type": "object",
+            "properties": {
+                "amalgamation_subjects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SubjectPreview"
+                    }
+                },
+                "character_image": {
+                    "type": "string"
+                },
+                "characters": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "meaning_mnemonic": {
+                    "type": "string"
+                },
+                "meanings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Meaning"
+                    }
+                },
+                "object": {
+                    "$ref": "#/definitions/model.Object"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StatusResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -242,6 +749,105 @@ const docTemplate = `{
                     }
                 },
                 "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ToggleFavoriteMeaningMnemonic": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateMeaningMnemonic": {
+            "type": "object",
+            "required": [
+                "id",
+                "text"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Vocabulary": {
+            "type": "object",
+            "properties": {
+                "characters": {
+                    "type": "string"
+                },
+                "component_subjects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SubjectPreview"
+                    }
+                },
+                "context_sentences": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ContextSentence"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "meanings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Meaning"
+                    }
+                },
+                "object": {
+                    "$ref": "#/definitions/model.Object"
+                },
+                "reading_mnemonic": {
+                    "type": "string"
+                },
+                "readings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.VocabularyReading"
+                    }
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VoteMeaningMnemonic": {
+            "type": "object",
+            "required": [
+                "meaning_mnemonic_id",
+                "vote"
+            ],
+            "properties": {
+                "meaning_mnemonic_id": {
+                    "type": "string"
+                },
+                "vote": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.ContextSentence": {
+            "type": "object",
+            "properties": {
+                "en": {
+                    "type": "string"
+                },
+                "hiragana": {
+                    "type": "string"
+                },
+                "ja": {
                     "type": "string"
                 }
             }
@@ -283,6 +889,27 @@ const docTemplate = `{
                 "ObjectRadical",
                 "ObjectVocabulary"
             ]
+        },
+        "model.VocabularyReading": {
+            "type": "object",
+            "properties": {
+                "primary": {
+                    "type": "boolean"
+                },
+                "reading": {
+                    "type": "string"
+                },
+                "romaji": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

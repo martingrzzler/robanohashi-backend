@@ -9,12 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @tags Search
+// @summary search for subjects
+// @produce json
+// @router /search [get]
+// @success 200 {object} dto.ListResponse[dto.SubjectPreview]
+// @failure 500 {object} dto.ErrorResponse
+// @failure 400 {object} dto.ErrorResponse
+// @param query query string true "Search query"
 func Search(c *gin.Context) {
 	query := c.Query("query")
 
 	if query == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "query parameter is required",
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "query parameter is required",
 		})
 		return
 	}
@@ -24,8 +32,8 @@ func Search(c *gin.Context) {
 	res, err := db.SearchSubjects(context.Background(), query)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong",
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "Something went wrong",
 		})
 		return
 	}
@@ -33,14 +41,14 @@ func Search(c *gin.Context) {
 	totalCount, subjects, err := dto.ParseFTSearchResult[dto.SubjectPreview](res)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"total_count": totalCount,
-		"data":        subjects,
+	c.JSON(http.StatusOK, dto.ListResponse[dto.SubjectPreview]{
+		TotalCount: totalCount,
+		Data:       subjects,
 	})
 }
