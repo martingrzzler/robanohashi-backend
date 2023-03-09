@@ -23,7 +23,7 @@ func Create(cfg config.Config) *gin.Engine {
 		log.Fatal("Failed to connect to Redis:", err)
 	}
 	r := gin.Default()
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Use(func(c *gin.Context) {
 		c.Set("db", db)

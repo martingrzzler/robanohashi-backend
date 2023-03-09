@@ -9,7 +9,7 @@ import (
 // @title Roba no hashi API
 // @description Query Kanji, Vocabulary, and Radicals with Mnemonics
 // @version 1.0.0
-// @host robanohashi.org
+// @host api.robanohashi.org
 // @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization
@@ -18,5 +18,5 @@ func main() {
 	cfg := config.NewConfig()
 	r := api.Create(cfg)
 
-	r.Run(":5000")
+	r.Run(":4000")
 }

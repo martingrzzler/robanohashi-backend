@@ -1,0 +1,54 @@
+version: "3.6"
+
+services:
+  traefik:
+    image: traefik:v2.9
+    container_name: robanohashi-traefik
+    command:
+      - "--providers.file.filename=/traefik.yml"
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "./letsencrypt:/letsencrypt"
+      - type: bind
+        source: ./traefik.yml
+        target: /traefik.yml
+        read_only: true
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+
+  api:
+    container_name: robanohashi-api
+    image: martingrzzler/robanohashi-api
+    environment:
+      - REDIS_URL=redis:6379
+      - REDIS_PASSWORD=
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`api.robanohashi.org`)"
+    depends_on:
+      - redis
+    restart: on-failure
+
+    volumes:
+      - type: bind
+        source: ./serviceAccountKey.json
+        target: /serviceAccountKey.json
+        read_only: true
+    networks:
+      - traefik-net
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: robanohashi-redis
+    volumes:
+      - ./data:/data
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true

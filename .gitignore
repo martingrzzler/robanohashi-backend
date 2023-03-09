@@ -2,3 +2,10 @@
 
 # Firebase
 serviceAccountKey.json
+
+# Redis Data
+/data
+
+# Terraform
+/.terraform
+terraform*
