@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"robanohashi/internal/config"
 	"robanohashi/persist"
 )
 
 func main() {
-	db, err := persist.Connect()
+	cfg := config.NewConfig()
+	db, err := persist.Connect(cfg.RedisURL, cfg.RedisPassword)
 	if err != nil {
 		log.Fatal(err)
 	}

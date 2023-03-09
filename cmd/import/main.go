@@ -8,13 +8,14 @@ import (
 	"log"
 	"os"
 	"robanohashi/cmd/import/wanikani"
+	"robanohashi/internal/config"
 	"robanohashi/internal/model"
 	"robanohashi/persist"
 )
 
 func main() {
-
-	db, err := persist.Connect()
+	cfg := config.NewConfig()
+	db, err := persist.Connect(cfg.RedisURL, cfg.RedisPassword)
 	if err != nil {
 		log.Fatal(err)
 	}

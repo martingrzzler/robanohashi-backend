@@ -18,10 +18,10 @@ func (db *DB) Client() *redis.Client {
 	return db.rdb
 }
 
-func Connect() (*DB, error) {
+func Connect(url string, password string) (*DB, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
+		Addr:     url,
+		Password: password,
 		DB:       0,
 	})
 
