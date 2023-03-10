@@ -31,7 +31,12 @@ func Create(cfg config.Config) *gin.Engine {
 		c.Next()
 	})
 
-	r.Use(cors.Default())
+	c := cors.DefaultConfig()
+	c.AllowOrigins = []string{"http://localhost:4000", "https://robanohashi.org"}
+	c.AllowCredentials = true
+	c.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+
+	r.Use(cors.New(c))
 
 	opt := option.WithCredentialsFile("serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
@@ -45,6 +50,7 @@ func Create(cfg config.Config) *gin.Engine {
 	}
 
 	authorized := r.Group("")
+
 	authorized.Use(middleware.ValidateFirebaseToken(auth, true))
 
 	authorized.POST("/meaning_mnemonic", controllers.CreateMeaningMnemonic)

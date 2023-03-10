@@ -3,7 +3,6 @@ version: "3.6"
 services:
   traefik:
     image: traefik:v2.9
-    container_name: robanohashi-traefik
     command:
       - "--providers.file.filename=/traefik.yml"
     networks:
@@ -25,7 +24,6 @@ services:
 
   web:
     image: nginx
-    container_name: robanohashi-nginx
     volumes:
       - ./web:/usr/share/nginx/html
     labels:
@@ -35,7 +33,6 @@ services:
       - traefik-net
 
   api:
-    container_name: robanohashi-api
     image: martingrzzler/robanohashi-api
     environment:
       - REDIS_URL=redis:6379
@@ -45,7 +42,12 @@ services:
       - "traefik.http.routers.api.rule=Host(`api.robanohashi.org`)"
     depends_on:
       - redis
-    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
     volumes:
       - type: bind
@@ -57,7 +59,6 @@ services:
 
   redis:
     image: redis/redis-stack:latest
-    container_name: robanohashi-redis
     volumes:
       - ./data:/data
     networks:
@@ -65,4 +66,3 @@ services:
 
 networks:
   traefik-net:
-    external: true
