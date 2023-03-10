@@ -18,7 +18,21 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
+    labels:
+      - "traefik.http.middlewares.cors.headers.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.cors.headers.Access-Control-Allow-Methods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.cors.headers.Access-Control-Allow-Headers=Content-Type"
+
+  web:
+    image: nginx
+    container_name: robanohashi-nginx
+    volumes:
+      - ./web:/usr/share/nginx/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`robanohashi.org`)"
+    networks:
+      - traefik-net
 
   api:
     container_name: robanohashi-api
