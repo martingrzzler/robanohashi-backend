@@ -1,5 +1,10 @@
 package model
 
+import (
+	"encoding/json"
+	"errors"
+)
+
 type Reading interface {
 	GetReading() string
 	IsPrimary() bool
@@ -34,6 +39,21 @@ type MeaningMnemonic struct {
 	UserID    string `json:"user_id"`
 	CreatedAt int64  `json:"created_at"`
 	UpdatedAt int64  `json:"updated_at"`
+}
+
+func (m MeaningMnemonic) UnmarshalRaw(data any) (MeaningMnemonic, error) {
+	s, ok := data.(string)
+	if !ok {
+		return MeaningMnemonic{}, errors.New("could not convert data to string")
+	}
+
+	mm := MeaningMnemonic{}
+
+	err := json.Unmarshal([]byte(s), &mm)
+	if err != nil {
+		return MeaningMnemonic{}, err
+	}
+	return mm, nil
 }
 
 type Subject interface {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"robanohashi/internal/dto"
+	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
 	"strings"
 
@@ -12,6 +14,33 @@ import (
 
 type DB struct {
 	rdb *redis.Client
+}
+
+type RawUnmarshaler[T any] interface {
+	UnmarshalRaw(data any) (T, error)
+}
+
+func parseFTSearchResult[T RawUnmarshaler[T]](result any) (int64, []T, error) {
+	items := make([]T, 0)
+
+	for i, item := range result.([]any)[1:] {
+		if i%2 == 0 {
+			continue
+		}
+
+		obj := *new(T)
+
+		parsed, err := obj.UnmarshalRaw(item.([]any)[1])
+		if err != nil {
+			return 0, nil, err
+		}
+
+		items = append(items, parsed)
+	}
+
+	totalCount := result.([]interface{})[0].(int64)
+
+	return totalCount, items, nil
 }
 
 func (db *DB) Client() *redis.Client {
@@ -48,7 +77,7 @@ func (db *DB) Close() {
 	db.rdb.Close()
 }
 
-func (db *DB) SearchSubjects(ctx context.Context, search string) (any, error) {
+func (db *DB) SearchSubjects(ctx context.Context, search string) (*dto.List[dto.SubjectPreview], error) {
 
 	query := ""
 	if len(strings.Split(search, " ")) > 1 {
@@ -57,13 +86,43 @@ func (db *DB) SearchSubjects(ctx context.Context, search string) (any, error) {
 		query = fmt.Sprintf("((@characters:{%s*}) => { $weight: 2.0 } | (@meaning:(%s*)) | (@reading:{%s*}) | (@romaji:{%s*}))", search, search, search, search)
 	}
 
-	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "20").Result()
+	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "20").Result()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to search subjects: %w", err)
+	}
+
+	totalCount, subjects, err := parseFTSearchResult[dto.SubjectPreview](res)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse subjects: %w", err)
+	}
+
+	return &dto.List[dto.SubjectPreview]{
+		TotalCount: totalCount,
+		Items:      subjects,
+	}, nil
 }
 
-func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (any, error) {
+func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (*dto.List[model.MeaningMnemonic], error) {
 	query := fmt.Sprintf("@subject_id:{%d}", id)
 
-	return db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "SORTBY", "voting_count", "DESC", "LIMIT", "0", "100", "RETURN", "1", "$").Result()
+	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "SORTBY", "voting_count", "DESC", "LIMIT", "0", "100", "RETURN", "1", "$").Result()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get meaning mnemonics: %w", err)
+	}
+
+	totalCount, items, err := parseFTSearchResult[model.MeaningMnemonic](res)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse meaning mnemonics: %w", err)
+	}
+
+	return &dto.List[model.MeaningMnemonic]{
+		TotalCount: totalCount,
+		Items:      items,
+	}, nil
 }
 
 func (db *DB) JSONGet(ctx context.Context, key string) (any, error) {

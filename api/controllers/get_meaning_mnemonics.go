@@ -39,28 +39,16 @@ func GetMeaningMnemonics(c *gin.Context) {
 		return
 	}
 
-	totalCount, mnemonics, err := dto.ParseFTSearchResult[dto.MeaningMnemonic](res)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: err.Error(),
-		})
-		return
-	}
-
 	_, exists := c.Get("uid")
 
 	if !exists {
-		c.JSON(http.StatusOK, dto.ListResponse[dto.MeaningMnemonic]{
-			TotalCount: totalCount,
-			Data:       mnemonics,
-		})
+		c.JSON(http.StatusOK, res)
 		return
 	}
 
 	uid := c.MustGet("uid").(string)
 
-	mnemonicsWithVotes, err := db.ResolveUserVotes(context.Background(), uid, mnemonics)
+	mnemonicsWithUserInfo, err := db.ResolveUserInfo(context.Background(), uid, res.Items)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
@@ -69,8 +57,8 @@ func GetMeaningMnemonics(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.ListResponse[dto.MeaningMnemonicWithUserInfo]{
-		TotalCount: totalCount,
-		Data:       mnemonicsWithVotes,
+	c.JSON(http.StatusOK, dto.List[dto.MeaningMnemonicWithUserInfo]{
+		TotalCount: res.TotalCount,
+		Items:      mnemonicsWithUserInfo,
 	})
 }

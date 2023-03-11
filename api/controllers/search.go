@@ -29,7 +29,7 @@ func Search(c *gin.Context) {
 
 	db := c.MustGet("db").(*persist.DB)
 
-	res, err := db.SearchSubjects(context.Background(), query)
+	data, err := db.SearchSubjects(context.Background(), query)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
@@ -38,17 +38,5 @@ func Search(c *gin.Context) {
 		return
 	}
 
-	totalCount, subjects, err := dto.ParseFTSearchResult[dto.SubjectPreview](res)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, dto.ListResponse[dto.SubjectPreview]{
-		TotalCount: totalCount,
-		Data:       subjects,
-	})
+	c.JSON(http.StatusOK, data)
 }

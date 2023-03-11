@@ -87,16 +87,16 @@ func (db *DB) DownvoteMeaningMnemonic(ctx context.Context, mid string, uid strin
 }
 
 func (db *DB) ToggleFavoriteMeaningMnemonic(ctx context.Context, mid string, uid string) (string, error) {
-	return db.toggleSetValue(ctx, keys.MeaningMnemonicFavorites(mid), uid)
+	return db.toggleSetValue(ctx, keys.MeaningMnemonicFavorites(uid), mid)
 }
 
-func (db *DB) ResolveUserVotes(ctx context.Context, uid string, mnemonics []dto.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
+func (db *DB) ResolveUserInfo(ctx context.Context, uid string, mnemonics []model.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
 	pipe := db.rdb.Pipeline()
 
 	for _, mnemonic := range mnemonics {
 		pipe.SIsMember(ctx, keys.MeaningMnemonicUpVoters(mnemonic.ID), uid)
 		pipe.SIsMember(ctx, keys.MeaningMnemonicDownVoters(mnemonic.ID), uid)
-		pipe.SIsMember(ctx, keys.MeaningMnemonicFavorites(mnemonic.ID), uid)
+		pipe.SIsMember(ctx, keys.MeaningMnemonicFavorites(uid), mnemonic.ID)
 	}
 
 	res, err := pipe.Exec(ctx)
@@ -160,4 +160,40 @@ func (db *DB) DeleteMeaningMnemonic(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (db *DB) GetFavoriteMeaningMnemonics(ctx context.Context, uid string) ([]model.MeaningMnemonic, error) {
+	mids, err := db.rdb.SMembers(ctx, keys.MeaningMnemonicFavorites(uid)).Result()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get favorite meaning mnemonics: %w", err)
+	}
+
+	pipe := db.rdb.Pipeline()
+	mnemonicsCmds := make([]*redis.Cmd, len(mids))
+
+	for i, id := range mids {
+		mnemonicsCmds[i] = pipe.Do(ctx, "JSON.GET", keys.MeaningMnemonic(id))
+	}
+
+	_, err = pipe.Exec(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute pipeline: %w", err)
+	}
+
+	mnemonics := make([]model.MeaningMnemonic, len(mnemonicsCmds))
+
+	for i, cmd := range mnemonicsCmds {
+		m := model.MeaningMnemonic{}
+		err = json.Unmarshal([]byte(cmd.Val().(string)), &m)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal meaning mnemonic: %w", err)
+		}
+
+		mnemonics[i] = m
+	}
+
+	return mnemonics, nil
 }

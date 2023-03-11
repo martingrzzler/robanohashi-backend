@@ -19,8 +19,8 @@ func MeaningMnemonicUpVoters(id string) string {
 	return fmt.Sprintf("meaning_mnemonic_up_voters:%s", id)
 }
 
-func MeaningMnemonicFavorites(id string) string {
-	return fmt.Sprintf("meaning_mnemonic_favorites:%s", id)
+func MeaningMnemonicFavorites(userId string) string {
+	return fmt.Sprintf("meaning_mnemonic_favorites:%s", userId)
 }
 
 func Kanji(id int) string {

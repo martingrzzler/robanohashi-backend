@@ -232,3 +232,34 @@ func DeleteMeaningMnemonic(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.StatusResponse{Status: "ok"})
 }
+
+// @tags Meaning-Mnemonic
+// @summary get all meaning mnemonics marked as favorite
+// @produce json
+// @router /meaning_mnemonic/favorites [get]
+// @success 200 {object} []dto.MeaningMnemonic
+// @failure 500 {object} dto.ErrorResponse
+// @security Bearer
+// @param request body dto.DeleteMeaningMnemonic true "mnemonic id"
+func GetFavoriteMeaningMnemonics(c *gin.Context) {
+	db := c.MustGet("db").(*persist.DB)
+	uid := c.MustGet("uid").(string)
+
+	mms, err := db.GetFavoriteMeaningMnemonics(context.Background(), uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	resolved, err := db.ResolveUserInfo(context.Background(), uid, mms)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.List[dto.MeaningMnemonicWithUserInfo]{
+		TotalCount: int64(len(resolved)),
+		Items:      resolved,
+	})
+}
