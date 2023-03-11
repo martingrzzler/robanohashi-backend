@@ -197,3 +197,33 @@ func (db *DB) GetFavoriteMeaningMnemonics(ctx context.Context, uid string) ([]mo
 
 	return mnemonics, nil
 }
+
+func (db *DB) getMeaningMnemonicsBy(ctx context.Context, query string) (*dto.List[model.MeaningMnemonic], error) {
+	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "SORTBY", "voting_count", "DESC", "LIMIT", "0", "100", "RETURN", "1", "$").Result()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get meaning mnemonics: %w", err)
+	}
+
+	totalCount, items, err := parseFTSearchResult[model.MeaningMnemonic](res)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse meaning mnemonics: %w", err)
+	}
+
+	return &dto.List[model.MeaningMnemonic]{
+		TotalCount: totalCount,
+		Items:      items,
+	}, nil
+}
+
+func (db *DB) GetMeaningMnemonicsByUser(ctx context.Context, uid string) (*dto.List[model.MeaningMnemonic], error) {
+	query := fmt.Sprintf("@user_id:{%s}", uid)
+	return db.getMeaningMnemonicsBy(ctx, query)
+}
+
+func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (*dto.List[model.MeaningMnemonic], error) {
+	query := fmt.Sprintf("@subject_id:{%d}", id)
+
+	return db.getMeaningMnemonicsBy(ctx, query)
+}

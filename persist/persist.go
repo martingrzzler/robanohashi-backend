@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"robanohashi/internal/dto"
-	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
 	"strings"
 
@@ -78,7 +77,6 @@ func (db *DB) Close() {
 }
 
 func (db *DB) SearchSubjects(ctx context.Context, search string) (*dto.List[dto.SubjectPreview], error) {
-
 	query := ""
 	if len(strings.Split(search, " ")) > 1 {
 		query = fmt.Sprintf("@meaning:(%s*)", search)
@@ -101,27 +99,6 @@ func (db *DB) SearchSubjects(ctx context.Context, search string) (*dto.List[dto.
 	return &dto.List[dto.SubjectPreview]{
 		TotalCount: totalCount,
 		Items:      subjects,
-	}, nil
-}
-
-func (db *DB) GetMeaningMnemonicsBySubjectID(ctx context.Context, id int) (*dto.List[model.MeaningMnemonic], error) {
-	query := fmt.Sprintf("@subject_id:{%d}", id)
-
-	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.MeaningMnemonicIndex(), query, "SORTBY", "voting_count", "DESC", "LIMIT", "0", "100", "RETURN", "1", "$").Result()
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get meaning mnemonics: %w", err)
-	}
-
-	totalCount, items, err := parseFTSearchResult[model.MeaningMnemonic](res)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse meaning mnemonics: %w", err)
-	}
-
-	return &dto.List[model.MeaningMnemonic]{
-		TotalCount: totalCount,
-		Items:      items,
 	}, nil
 }
 

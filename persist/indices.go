@@ -42,6 +42,7 @@ func (db *DB) createMeaningMnemonicIndex() error {
 		"PREFIX", "1", "meaning_mnemonic:",
 		"SCHEMA",
 		"$.subject_id", "AS", "subject_id", "TAG",
+		"$.user_id", "AS", "user_id", "TAG",
 		"$.voting_count", "AS", "voting_count", "NUMERIC", "SORTABLE",
 	).Err()
 

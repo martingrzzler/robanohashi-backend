@@ -262,3 +262,34 @@ func GetFavoriteMeaningMnemonics(c *gin.Context) {
 		Items:      resolved,
 	})
 }
+
+// @tags Meaning-Mnemonic
+// @summary get all meaning mnemonics created by the user
+// @produce json
+// @router /user/meaning_mnemonics [get]
+// @success 200 {object} []dto.List[dto.MeaningMnemonicWithUserInfo]
+// @failure 500 {object} dto.ErrorResponse
+// @failure 404 {object} dto.ErrorResponse
+// @security Bearer
+func GetUserMeaningMnemonics(c *gin.Context) {
+	db := c.MustGet("db").(*persist.DB)
+	uid := c.MustGet("uid").(string)
+
+	res, err := db.GetMeaningMnemonicsByUser(context.Background(), uid)
+	if err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	resolved, err := db.ResolveUserInfo(context.Background(), uid, res.Items)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.List[dto.MeaningMnemonicWithUserInfo]{
+		TotalCount: res.TotalCount,
+		Items:      resolved,
+	})
+}
