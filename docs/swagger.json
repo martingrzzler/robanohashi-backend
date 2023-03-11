@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0.0"
     },
-    "host": "robanohashi.org",
+    "host": "api.robanohashi.org",
     "paths": {
         "/kanji/{id}": {
             "get": {
@@ -134,7 +134,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.MeaningMnemonic"
+                            "$ref": "#/definitions/dto.CreatedResponse"
                         }
                     },
                     "400": {
@@ -198,6 +198,39 @@
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/meaning_mnemonic/favorites": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "get all meaning mnemonics marked as favorite",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo"
+                            }
                         }
                     },
                     "500": {
@@ -383,7 +416,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListResponse-dto_SubjectPreview"
+                            "$ref": "#/definitions/dto.List-dto_SubjectPreview"
                         }
                     },
                     "400": {
@@ -423,7 +456,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListResponse-dto_MeaningMnemonicWithUserInfo"
+                            "$ref": "#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo"
                         }
                     },
                     "400": {
@@ -508,6 +541,14 @@
                 }
             }
         },
+        "dto.CreatedResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.DeleteMeaningMnemonic": {
             "type": "object",
             "required": [
@@ -577,10 +618,10 @@
                 }
             }
         },
-        "dto.ListResponse-dto_MeaningMnemonicWithUserInfo": {
+        "dto.List-dto_MeaningMnemonicWithUserInfo": {
             "type": "object",
             "properties": {
-                "data": {
+                "items": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.MeaningMnemonicWithUserInfo"
@@ -591,43 +632,16 @@
                 }
             }
         },
-        "dto.ListResponse-dto_SubjectPreview": {
+        "dto.List-dto_SubjectPreview": {
             "type": "object",
             "properties": {
-                "data": {
+                "items": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.SubjectPreview"
                     }
                 },
                 "total_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.MeaningMnemonic": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "subject_id": {
-                    "description": "must be string ensure that TAG for the index works as expected",
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "voting_count": {
                     "type": "integer"
                 }
             }

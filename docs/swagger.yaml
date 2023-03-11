@@ -12,6 +12,11 @@ definitions:
     - subject_id
     - text
     type: object
+  dto.CreatedResponse:
+    properties:
+      id:
+        type: string
+    type: object
   dto.DeleteMeaningMnemonic:
     properties:
       id:
@@ -57,40 +62,22 @@ definitions:
           $ref: '#/definitions/dto.SubjectPreview'
         type: array
     type: object
-  dto.ListResponse-dto_MeaningMnemonicWithUserInfo:
+  dto.List-dto_MeaningMnemonicWithUserInfo:
     properties:
-      data:
+      items:
         items:
           $ref: '#/definitions/dto.MeaningMnemonicWithUserInfo'
         type: array
       total_count:
         type: integer
     type: object
-  dto.ListResponse-dto_SubjectPreview:
+  dto.List-dto_SubjectPreview:
     properties:
-      data:
+      items:
         items:
           $ref: '#/definitions/dto.SubjectPreview'
         type: array
       total_count:
-        type: integer
-    type: object
-  dto.MeaningMnemonic:
-    properties:
-      created_at:
-        type: integer
-      id:
-        type: string
-      subject_id:
-        description: must be string ensure that TAG for the index works as expected
-        type: string
-      text:
-        type: string
-      updated_at:
-        type: integer
-      user_id:
-        type: string
-      voting_count:
         type: integer
     type: object
   dto.MeaningMnemonicWithUserInfo:
@@ -268,7 +255,7 @@ definitions:
       romaji:
         type: string
     type: object
-host: robanohashi.org
+host: api.robanohashi.org
 info:
   contact: {}
   description: Query Kanji, Vocabulary, and Radicals with Mnemonics
@@ -356,7 +343,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.MeaningMnemonic'
+            $ref: '#/definitions/dto.CreatedResponse'
         "400":
           description: Bad Request
           schema:
@@ -400,6 +387,26 @@ paths:
       security:
       - Bearer: []
       summary: update the meaning mnemonic text
+      tags:
+      - Meaning-Mnemonic
+  /meaning_mnemonic/favorites:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: get all meaning mnemonics marked as favorite
       tags:
       - Meaning-Mnemonic
   /meaning_mnemonic/toggle_favorite:
@@ -512,7 +519,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ListResponse-dto_SubjectPreview'
+            $ref: '#/definitions/dto.List-dto_SubjectPreview'
         "400":
           description: Bad Request
           schema:
@@ -538,7 +545,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ListResponse-dto_MeaningMnemonicWithUserInfo'
+            $ref: '#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo'
         "400":
           description: Bad Request
           schema:

@@ -18,7 +18,7 @@ import (
 // @summary create a meaning mnemonic for a kanji or vocabulary
 // @produce json
 // @router /meaning_mnemonic [post]
-// @success 201 {object} dto.MeaningMnemonic
+// @success 201 {object} dto.CreatedResponse
 // @failure 400 {object} dto.ErrorResponse
 // @failure 500 {object} dto.ErrorResponse
 // @param request body dto.CreateMeaningMnemonic true "Meaning mnemonic"
@@ -237,10 +237,9 @@ func DeleteMeaningMnemonic(c *gin.Context) {
 // @summary get all meaning mnemonics marked as favorite
 // @produce json
 // @router /meaning_mnemonic/favorites [get]
-// @success 200 {object} []dto.MeaningMnemonic
+// @success 200 {object} []dto.List[dto.MeaningMnemonicWithUserInfo]
 // @failure 500 {object} dto.ErrorResponse
 // @security Bearer
-// @param request body dto.DeleteMeaningMnemonic true "mnemonic id"
 func GetFavoriteMeaningMnemonics(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
 	uid := c.MustGet("uid").(string)

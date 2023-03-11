@@ -14,7 +14,7 @@ import (
 // @summary get meaning mnemonics optionally with user data if authenticated
 // @produce json
 // @router /subject/{id}/meaning_mnemonics [get]
-// @success 200 {object} dto.ListResponse[dto.MeaningMnemonicWithUserInfo]
+// @success 200 {object} dto.List[dto.MeaningMnemonicWithUserInfo]
 // @failure 500 {object} dto.ErrorResponse
 // @failure 400 {object} dto.ErrorResponse
 // @param id path int true "Subject ID vocabulary or kanji"

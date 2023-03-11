@@ -13,7 +13,7 @@ import (
 // @summary search for subjects
 // @produce json
 // @router /search [get]
-// @success 200 {object} dto.ListResponse[dto.SubjectPreview]
+// @success 200 {object} dto.List[dto.SubjectPreview]
 // @failure 500 {object} dto.ErrorResponse
 // @failure 400 {object} dto.ErrorResponse
 // @param query query string true "Search query"

@@ -141,7 +141,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.MeaningMnemonic"
+                            "$ref": "#/definitions/dto.CreatedResponse"
                         }
                     },
                     "400": {
@@ -205,6 +205,39 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/meaning_mnemonic/favorites": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meaning-Mnemonic"
+                ],
+                "summary": "get all meaning mnemonics marked as favorite",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo"
+                            }
                         }
                     },
                     "500": {
@@ -390,7 +423,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListResponse-dto_SubjectPreview"
+                            "$ref": "#/definitions/dto.List-dto_SubjectPreview"
                         }
                     },
                     "400": {
@@ -430,7 +463,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListResponse-dto_MeaningMnemonicWithUserInfo"
+                            "$ref": "#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo"
                         }
                     },
                     "400": {
@@ -515,6 +548,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreatedResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.DeleteMeaningMnemonic": {
             "type": "object",
             "required": [
@@ -584,10 +625,10 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ListResponse-dto_MeaningMnemonicWithUserInfo": {
+        "dto.List-dto_MeaningMnemonicWithUserInfo": {
             "type": "object",
             "properties": {
-                "data": {
+                "items": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.MeaningMnemonicWithUserInfo"
@@ -598,43 +639,16 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ListResponse-dto_SubjectPreview": {
+        "dto.List-dto_SubjectPreview": {
             "type": "object",
             "properties": {
-                "data": {
+                "items": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.SubjectPreview"
                     }
                 },
                 "total_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.MeaningMnemonic": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "subject_id": {
-                    "description": "must be string ensure that TAG for the index works as expected",
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "voting_count": {
                     "type": "integer"
                 }
             }
@@ -917,7 +931,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.0",
-	Host:             "robanohashi.org",
+	Host:             "api.robanohashi.org",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Roba no hashi API",
