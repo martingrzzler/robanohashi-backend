@@ -557,6 +557,30 @@ paths:
       summary: get meaning mnemonics optionally with user data if authenticated
       tags:
       - Subject
+  /user/meaning_mnemonics:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.List-dto_MeaningMnemonicWithUserInfo'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: get all meaning mnemonics created by the user
+      tags:
+      - Meaning-Mnemonic
   /vocabulary/{id}:
     get:
       parameters:
