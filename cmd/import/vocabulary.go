@@ -43,7 +43,7 @@ func InsertVocabulary(ctx context.Context, db *persist.DB, wkVocabulary *wanikan
 		ContextSentences:    createContextSentences(wkVocabulary),
 	}
 
-	err = db.JSONSet(keys.Vocabulary(wkVocabulary.ID), "$", vocabulary)
+	err = db.JSONSet(keys.Subject(wkVocabulary.ID), "$", vocabulary)
 	if err != nil {
 		log.Fatal(err)
 	}

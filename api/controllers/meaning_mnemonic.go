@@ -250,7 +250,7 @@ func GetFavoriteMeaningMnemonics(c *gin.Context) {
 		return
 	}
 
-	resolved, err := db.ResolveUserInfo(context.Background(), uid, mms)
+	resolved, err := db.ResolveMeaningMnemonics(context.Background(), uid, mms)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
@@ -281,7 +281,7 @@ func GetUserMeaningMnemonics(c *gin.Context) {
 		return
 	}
 
-	resolved, err := db.ResolveUserInfo(context.Background(), uid, res.Items)
+	resolved, err := db.ResolveMeaningMnemonics(context.Background(), uid, res.Items)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})

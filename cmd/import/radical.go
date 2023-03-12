@@ -22,7 +22,7 @@ func InsertRadical(ctx context.Context, db *persist.DB, wkRadical *wanikani.Subj
 		MeaningMnemonic:        wkRadical.Data.MeaningMnemonic,
 	}
 
-	err := db.JSONSet(keys.Radical(wkRadical.ID), "$", radical)
+	err := db.JSONSet(keys.Subject(wkRadical.ID), "$", radical)
 	if err != nil {
 		log.Fatal(err)
 	}

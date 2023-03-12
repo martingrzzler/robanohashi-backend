@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func (db *DB) GetVocabulary(ctx context.Context, id int) (*model.Vocabulary, error) {
-	data, err := db.JSONGet(ctx, keys.Vocabulary(id))
+	data, err := db.JSONGet(ctx, keys.Subject(id))
 	if err != nil {
 		return nil, err
 	}
@@ -23,16 +24,20 @@ func (db *DB) GetVocabulary(ctx context.Context, id int) (*model.Vocabulary, err
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}
 
+	if vocab.Object != model.ObjectVocabulary {
+		return nil, fmt.Errorf("subject is not a vocabulary")
+	}
+
 	return vocab, nil
 }
 
-func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary) (*model.ResolvedVocabulary, error) {
+func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary) (*dto.Vocabulary, error) {
 	pipe := db.rdb.Pipeline()
 
 	componentCmds := make([]*redis.Cmd, len(vocab.ComponentSubjectIds))
 
 	for i, id := range vocab.ComponentSubjectIds {
-		componentCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Kanji(id))
+		componentCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
 	}
 
 	_, err := pipe.Exec(ctx)
@@ -41,7 +46,7 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 		return nil, fmt.Errorf("failed to execute pipeline: %w", err)
 	}
 
-	resolvedVocab := &model.ResolvedVocabulary{
+	resolvedVocab := &dto.Vocabulary{
 		ID:                vocab.ID,
 		Object:            vocab.Object,
 		Slug:              vocab.Slug,
@@ -50,7 +55,7 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 		ReadingMnemonic:   vocab.ReadingMnemonic,
 		Readings:          vocab.Readings,
 		ContextSentences:  vocab.ContextSentences,
-		ComponentSubjects: make([]model.Kanji, len(componentCmds)),
+		ComponentSubjects: make([]dto.SubjectPreview, len(componentCmds)),
 	}
 
 	for i, cmd := range componentCmds {
@@ -61,7 +66,7 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 			return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 		}
 
-		resolvedVocab.ComponentSubjects[i] = kanji
+		resolvedVocab.ComponentSubjects[i] = dto.CreateSubjectPreview(&kanji)
 	}
 
 	return resolvedVocab, nil

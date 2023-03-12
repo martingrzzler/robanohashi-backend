@@ -42,7 +42,7 @@ func InsertKanji(ctx context.Context, db *persist.DB, wkKanji *wanikani.Subject[
 		VisuallySimilarSubjectIds: wkKanji.Data.VisuallySimilarSubjectIds,
 	}
 
-	err = db.JSONSet(keys.Kanji(wkKanji.ID), "$", kanji)
+	err = db.JSONSet(keys.Subject(wkKanji.ID), "$", kanji)
 	if err != nil {
 		log.Fatal(err)
 	}

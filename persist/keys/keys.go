@@ -23,16 +23,8 @@ func MeaningMnemonicFavorites(userId string) string {
 	return fmt.Sprintf("meaning_mnemonic_favorites:%s", userId)
 }
 
-func Kanji(id int) string {
-	return fmt.Sprintf("kanji:%d", id)
-}
-
-func Radical(id int) string {
-	return fmt.Sprintf("radical:%d", id)
-}
-
-func Vocabulary(id int) string {
-	return fmt.Sprintf("vocabulary:%d", id)
+func Subject(id int) string {
+	return fmt.Sprintf("subject:%d", id)
 }
 
 func SubjectIndex() string {

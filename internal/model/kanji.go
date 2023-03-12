@@ -13,20 +13,6 @@ type Kanji struct {
 	VisuallySimilarSubjectIds []int          `json:"visually_similar_subject_ids"`
 }
 
-// contains the actual subject rather than the subject ids
-type ResolvedKanji struct {
-	ID                      int            `json:"id"`
-	Object                  Object         `json:"object"`
-	Characters              string         `json:"characters"`
-	Slug                    string         `json:"slug"`
-	ReadingMnemonic         string         `json:"reading_mnemonic"`
-	AmalgamationSubjects    []Vocabulary   `json:"amalgamation_subject_ids"`
-	Meanings                []Meaning      `json:"meanings"`
-	Readings                []KanjiReading `json:"readings"`
-	ComponentSubjects       []Radical      `json:"component_subject_ids"`
-	VisuallySimilarSubjects []Kanji        `json:"visually_similar_subject_ids"`
-}
-
 func (k Kanji) GetID() int {
 	return k.ID
 }

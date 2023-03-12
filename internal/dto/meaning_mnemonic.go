@@ -16,11 +16,17 @@ type VoteMeaningMnemonic struct {
 }
 
 type MeaningMnemonicWithUserInfo struct {
-	model.MeaningMnemonic
-	Upvoted   bool `json:"upvoted"`
-	Downvoted bool `json:"downvoted"`
-	Favorite  bool `json:"favorite"`
-	Me        bool `json:"me"`
+	ID          string          `json:"id"`
+	Text        string          `json:"text"`
+	VotingCount int             `json:"voting_count"`
+	Subject     MnemonicSubject `json:"subject_id"`
+	UserID      string          `json:"user_id"`
+	CreatedAt   int64           `json:"created_at"`
+	UpdatedAt   int64           `json:"updated_at"`
+	Upvoted     bool            `json:"upvoted"`
+	Downvoted   bool            `json:"downvoted"`
+	Favorite    bool            `json:"favorite"`
+	Me          bool            `json:"me"`
 }
 
 type UpdateMeaningMnemonic struct {

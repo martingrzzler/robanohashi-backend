@@ -7,6 +7,7 @@ import (
 	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
+	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -90,7 +91,7 @@ func (db *DB) ToggleFavoriteMeaningMnemonic(ctx context.Context, mid string, uid
 	return db.toggleSetValue(ctx, keys.MeaningMnemonicFavorites(uid), mid)
 }
 
-func (db *DB) ResolveUserInfo(ctx context.Context, uid string, mnemonics []model.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
+func (db *DB) ResolveMeaningMnemonics(ctx context.Context, uid string, mnemonics []model.MeaningMnemonic) ([]dto.MeaningMnemonicWithUserInfo, error) {
 	pipe := db.rdb.Pipeline()
 
 	for _, mnemonic := range mnemonics {
@@ -105,19 +106,66 @@ func (db *DB) ResolveUserInfo(ctx context.Context, uid string, mnemonics []model
 		return nil, fmt.Errorf("failed to execute pipeline: %w", err)
 	}
 
-	votes := make([]dto.MeaningMnemonicWithUserInfo, len(mnemonics))
+	resolved := make([]dto.MeaningMnemonicWithUserInfo, len(mnemonics))
 
 	for i, mnemonic := range mnemonics {
-		votes[i] = dto.MeaningMnemonicWithUserInfo{
-			MeaningMnemonic: mnemonic,
-			Upvoted:         res[i*3].(*redis.BoolCmd).Val(),
-			Downvoted:       res[i*3+1].(*redis.BoolCmd).Val(),
-			Favorite:        res[i*3+2].(*redis.BoolCmd).Val(),
-			Me:              mnemonic.UserID == uid,
+		resolved[i] = dto.MeaningMnemonicWithUserInfo{
+			ID:          mnemonic.ID,
+			Text:        mnemonic.Text,
+			VotingCount: mnemonic.VotingCount,
+			UserID:      mnemonic.UserID,
+			CreatedAt:   mnemonic.CreatedAt,
+			UpdatedAt:   mnemonic.UpdatedAt,
+			Upvoted:     res[i*3].(*redis.BoolCmd).Val(),
+			Downvoted:   res[i*3+1].(*redis.BoolCmd).Val(),
+			Favorite:    res[i*3+2].(*redis.BoolCmd).Val(),
+			Me:          mnemonic.UserID == uid,
 		}
+
+		sid, _ := strconv.Atoi(mnemonic.SubjectID)
+
+		s, err := db.resolveMnemonicSubject(ctx, sid)
+		if err != nil {
+			return nil, err
+		}
+		resolved[i].Subject = s
 	}
 
-	return votes, nil
+	return resolved, nil
+}
+
+func (db *DB) resolveMnemonicSubject(ctx context.Context, sid int) (dto.MnemonicSubject, error) {
+	res, err := db.JSONGet(ctx, keys.Subject(sid))
+
+	if err != nil {
+		return nil, err
+	}
+
+	var data map[string]any
+	err = json.Unmarshal([]byte(res.(string)), &data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch model.Object(data["object"].(string)) {
+	case model.ObjectKanji:
+		kanji := &model.Kanji{}
+		err = json.Unmarshal([]byte(res.(string)), kanji)
+		if err != nil {
+			return nil, err
+		}
+		return db.GetKanjiResolved(ctx, kanji)
+	case "vocabulary":
+		vocab := &model.Vocabulary{}
+		err = json.Unmarshal([]byte(res.(string)), vocab)
+		if err != nil {
+			return nil, err
+		}
+		return db.GetVocabularyResolved(ctx, vocab)
+	}
+
+	return nil, fmt.Errorf("unknown object type: %s", data["object"].(string))
 }
 
 func (db *DB) GetMeaningMnemonic(ctx context.Context, id string) (*model.MeaningMnemonic, error) {

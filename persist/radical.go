@@ -11,7 +11,7 @@ import (
 )
 
 func (db *DB) GetRadical(ctx context.Context, id int) (*model.Radical, error) {
-	data, err := db.JSONGet(ctx, keys.Radical(id))
+	data, err := db.JSONGet(ctx, keys.Subject(id))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (db *DB) GetRadicalResolved(ctx context.Context, radical *model.Radical) (*
 	amalgamationCmds := make([]*redis.Cmd, len(radical.AmalgamationSubjectIds))
 
 	for i, id := range radical.AmalgamationSubjectIds {
-		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Kanji(id))
+		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
 	}
 
 	_, err := pipe.Exec(ctx)

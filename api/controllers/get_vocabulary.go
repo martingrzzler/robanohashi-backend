@@ -50,15 +50,5 @@ func GetVocabulary(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Vocabulary{
-		ID:                resolved.ID,
-		Object:            resolved.Object,
-		Slug:              resolved.Slug,
-		Characters:        resolved.Characters,
-		ComponentSubjects: dto.CreateSubjectPreviews(resolved.ComponentSubjects),
-		Meanings:          resolved.Meanings,
-		ReadingMnemonic:   resolved.ReadingMnemonic,
-		ContextSentences:  resolved.ContextSentences,
-		Readings:          resolved.Readings,
-	})
+	c.JSON(http.StatusOK, resolved)
 }

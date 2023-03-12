@@ -12,18 +12,6 @@ type Vocabulary struct {
 	Readings            []VocabularyReading `json:"readings"`
 }
 
-type ResolvedVocabulary struct {
-	ID                int                 `json:"id"`
-	Object            Object              `json:"object"`
-	Slug              string              `json:"slug"`
-	Characters        string              `json:"characters"`
-	ComponentSubjects []Kanji             `json:"component_subjects"`
-	Meanings          []Meaning           `json:"meanings"`
-	ReadingMnemonic   string              `json:"reading_mnemonic"`
-	ContextSentences  []ContextSentence   `json:"context_sentences"`
-	Readings          []VocabularyReading `json:"readings"`
-}
-
 func (v Vocabulary) GetID() int {
 	return v.ID
 }

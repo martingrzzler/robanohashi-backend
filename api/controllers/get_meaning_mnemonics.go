@@ -48,7 +48,7 @@ func GetMeaningMnemonics(c *gin.Context) {
 
 	uid := c.MustGet("uid").(string)
 
-	mnemonicsWithUserInfo, err := db.ResolveUserInfo(context.Background(), uid, res.Items)
+	mnemonicsWithUserInfo, err := db.ResolveMeaningMnemonics(context.Background(), uid, res.Items)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
