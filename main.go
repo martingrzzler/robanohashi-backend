@@ -15,7 +15,7 @@ import (
 // @name Authorization
 
 func main() {
-	cfg := config.NewConfig()
+	cfg := config.New()
 	r := api.Create(cfg)
 
 	r.Run(":4000")

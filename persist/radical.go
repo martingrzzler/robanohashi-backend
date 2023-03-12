@@ -23,6 +23,10 @@ func (db *DB) GetRadical(ctx context.Context, id int) (*model.Radical, error) {
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}
 
+	if radical.Object != model.ObjectRadical {
+		return nil, fmt.Errorf("subject is not a radical")
+	}
+
 	return radical, nil
 }
 

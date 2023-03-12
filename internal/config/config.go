@@ -7,7 +7,7 @@ type Config struct {
 	RedisPassword string
 }
 
-func NewConfig() Config {
+func New() Config {
 	return Config{
 		RedisURL:      os.Getenv("REDIS_URL"),
 		RedisPassword: os.Getenv("REDIS_PASSWORD"),

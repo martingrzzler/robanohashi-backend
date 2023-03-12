@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	cfg := config.NewConfig()
+	cfg := config.New()
 	db, err := persist.Connect(cfg.RedisURL, cfg.RedisPassword)
 	if err != nil {
 		log.Fatal(err)
