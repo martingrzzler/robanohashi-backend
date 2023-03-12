@@ -58,7 +58,7 @@ func Create(cfg config.Config) *gin.Engine {
 	authorized.DELETE("/meaning_mnemonic", controllers.DeleteMeaningMnemonic)
 	authorized.POST("/meaning_mnemonic/vote", controllers.VoteMeaningMnemonic)
 	authorized.POST("/meaning_mnemonic/toggle_favorite", controllers.ToggleFavoriteMeaningMnemonic)
-	authorized.GET("/meaning_mnemonic/favorites", controllers.GetFavoriteMeaningMnemonics)
+	authorized.GET("/meaning_mnemonics/favorites", controllers.GetFavoriteMeaningMnemonics)
 	authorized.GET("/user/meaning_mnemonics", controllers.GetUserMeaningMnemonics)
 
 	r.Use(middleware.ValidateFirebaseToken(auth, false))
