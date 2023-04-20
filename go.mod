@@ -8,9 +8,12 @@ require (
 	github.com/gojp/kana v0.1.0
 	github.com/google/uuid v1.3.0
 	github.com/redis/go-redis/v9 v9.0.2
+	github.com/gin-contrib/cors v1.4.0
+	github.com/swaggo/files v1.0.0
+	github.com/swaggo/gin-swagger v1.5.3
+	github.com/swaggo/swag v1.8.10
+	google.golang.org/api v0.111.0
 )
-
-require google.golang.org/api v0.111.0
 
 require (
 	cloud.google.com/go v0.110.0 // indirect
@@ -22,9 +25,6 @@ require (
 	cloud.google.com/go/storage v1.29.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/MicahParks/keyfunc v1.9.0 // indirect
-	github.com/PuerkitoBio/purell v1.2.0 // indirect
-	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/spec v0.20.8 // indirect
@@ -37,9 +37,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/swaggo/files v1.0.0 // indirect
-	github.com/swaggo/gin-swagger v1.5.3 // indirect
-	github.com/swaggo/swag v1.8.10 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
@@ -50,10 +47,6 @@ require (
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20230303212802-e74f57abe488 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
-)
-
-require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/bytedance/sonic v1.8.3 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
