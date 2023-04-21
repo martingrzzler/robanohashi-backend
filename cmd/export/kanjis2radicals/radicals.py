@@ -2,33 +2,26 @@ import datasets
 import json
 
 _DESCRIPTION = """\
-Contains Kanji images with corresponding radicals ids from WaniKani or https://api.robanohashi.org/docs/index.html
+Contains radical images with radicals ids from WaniKani or https://api.robanohashi.org/docs/index.html
 """
 
-_METADATA_URL = "https://huggingface.co/datasets/martingrzzler/kanjis2radicals/raw/main/kanji_metadata.jsonl"
-_IMAGES_URL = "https://huggingface.co/datasets/martingrzzler/kanjis2radicals/resolve/main/kanji.tar.gz"
+_METADATA_URL = "https://huggingface.co/datasets/martingrzzler/radicals/raw/main/radicals_metadata.jsonl"
+_IMAGES_URL = "https://huggingface.co/datasets/martingrzzler/radicals/resolve/main/radicals.tar.gz"
 
 
-class Kanji2Radicals(datasets.GeneratorBasedBuilder):
-    """Kanji to radicals dataset."""
+class Radicals(datasets.GeneratorBasedBuilder):
+    """Radicals dataset."""
 
     def _info(self):
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
             features=datasets.Features(
                 {
-                    "kanji_image": datasets.Image(),
+                    "radical_image": datasets.Image(),
                     "meta": {
                         "id": datasets.Value("int32"),
                         "characters": datasets.Value("string"),
-                        "meanings": datasets.Value("string"),
-                        "radicals": datasets.Sequence(
-                            {
-                                "characters": datasets.Value("string"),
-                                "id": datasets.Value("int32"),
-                                "slug": datasets.Value("string"),
-                            }
-                        ),
+                        "slug": datasets.Value("string"),
                     },
                 }
             ),
@@ -61,5 +54,5 @@ class Kanji2Radicals(datasets.GeneratorBasedBuilder):
         for idx, (image_path, image) in enumerate(images_iter):
             yield image_path, {
                 "meta": radicals[idx],
-                "kanji_image": image.read(),
+                "radical_image": image.read(),
             }
