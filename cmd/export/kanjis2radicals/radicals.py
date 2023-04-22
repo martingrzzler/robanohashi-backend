@@ -1,5 +1,6 @@
 import datasets
 import json
+import re
 
 _DESCRIPTION = """\
 Contains radical images with radicals ids from WaniKani or https://api.robanohashi.org/docs/index.html
@@ -45,14 +46,16 @@ class Radicals(datasets.GeneratorBasedBuilder):
         ]
 
     def _generate_examples(self, metadata_path, images_iter):
-        radicals = []
+        radicals = {}
+        pattern = r"/(\d+)"
         with open(metadata_path, encoding="utf-8") as f:
             for line in f:
                 metadata = json.loads(line)
-                radicals.append(metadata)
+                radicals[metadata["id"]] = metadata
 
         for idx, (image_path, image) in enumerate(images_iter):
+            id = int(re.search(pattern, image_path).group(1))
             yield image_path, {
-                "meta": radicals[idx],
+                "meta": radicals[id],
                 "radical_image": image.read(),
             }
