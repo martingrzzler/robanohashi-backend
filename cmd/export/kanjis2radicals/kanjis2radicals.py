@@ -6,7 +6,7 @@ Contains Kanji images with corresponding radicals ids from WaniKani or https://a
 """
 
 _METADATA_URL = "https://huggingface.co/datasets/martingrzzler/kanjis2radicals/raw/main/kanji_metadata.jsonl"
-_IMAGES_URL = "https://huggingface.co/datasets/martingrzzler/kanjis2radicals/resolve/main/kanji.tar.gz"
+_IMAGES_URL = "https://huggingface.co/datasets/martingrzzler/kanjis2radicals/resolve/main/kanjis.tar.gz"
 
 
 class Kanji2Radicals(datasets.GeneratorBasedBuilder):
@@ -52,14 +52,16 @@ class Kanji2Radicals(datasets.GeneratorBasedBuilder):
         ]
 
     def _generate_examples(self, metadata_path, images_iter):
-        radicals = []
+        meta_kanjis = {}
+
         with open(metadata_path, encoding="utf-8") as f:
             for line in f:
                 metadata = json.loads(line)
-                radicals.append(metadata)
+                meta_kanjis[metadata["characters"]] = metadata
 
         for idx, (image_path, image) in enumerate(images_iter):
+            characters = image_path.split("/")[-1].split(".")[0]
             yield image_path, {
-                "meta": radicals[idx],
+                "meta": meta_kanjis[characters],
                 "kanji_image": image.read(),
             }
