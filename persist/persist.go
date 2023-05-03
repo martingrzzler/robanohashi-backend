@@ -84,7 +84,7 @@ func (db *DB) SearchSubjects(ctx context.Context, search string) (*dto.List[dto.
 		query = fmt.Sprintf("((@characters:{%s*}) => { $weight: 2.0 } | (@meaning:(%s*)) | (@reading:{%s*}) | (@romaji:{%s*}))", search, search, search, search)
 	}
 
-	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "20").Result()
+	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "200").Result()
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to search subjects: %w", err)
