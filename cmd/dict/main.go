@@ -8,48 +8,26 @@ import (
 	"log"
 	"os"
 	"robanohashi/internal/config"
-	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist"
-	"strconv"
-	"strings"
+	"robanohashi/persist/keys"
 )
-
-type Meaning struct {
-	Meaning string `json:"meaning"`
-	Primary bool   `json:"primary"`
-}
 
 type Reading struct {
 	Reading string `json:"reading"`
-	Type    string `json:"type"`
+	Romaji  string `json:"romaji"`
+	Primary bool   `json:"primary"`
 }
 
-type KanjiData struct {
-	Characters string    `json:"characters"`
-	Object     string    `json:"object"`
-	Meanings   []Meaning `json:"meanings"`
-	Readings   []Reading `json:"readings"`
-	Slug       string    `json:"slug"`
-	Radicals   []string  `json:"radicals"`
+type VocabData struct {
+	Characters string   `json:"characters"`
+	Meanings   []string `json:"meanings"`
+	Reading    Reading  `json:"reading"`
+	Kanjis     []string `json:"kanjis"`
 }
 
 func main() {
-	// create csv file
-	// loop through all subjects
-	// continue if subject is not kanji
-	// if subject has no amalgamation_subject_ids add it to the csv file with 0 indicating no amalgamation
-	// else add it with the number of amalgamation_subject_ids
-
-	out := "kanjis.jsonl"
-	f, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
-
-	writer := bufio.NewWriter(f)
+	nextId := 17072
 
 	cfg := config.New()
 	db, err := persist.Connect(cfg.RedisURL, cfg.RedisPassword)
@@ -58,187 +36,87 @@ func main() {
 	}
 	defer db.Close()
 
-	keys, err := db.Client().Keys(context.TODO(), "subject:*").Result()
-
+	f, err := os.Open("vocabs.jsonl")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 
-	for _, key := range keys {
+	scanner := bufio.NewScanner(f)
 
-		id, err := strconv.Atoi(strings.Split(key, ":")[1])
+	for scanner.Scan() {
+		line := scanner.Text()
+		var data VocabData
 
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		raw, err := db.JSONGet(context.Background(), key)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var data map[string]any
-
-		err = json.Unmarshal([]byte(raw.(string)), &data)
+		err := json.Unmarshal([]byte(line), &data)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if data["object"] != "kanji" {
-			continue
+		v := model.Vocabulary{
+			ID:                  nextId,
+			Object:              "vocabulary",
+			Slug:                data.Characters,
+			Characters:          data.Characters,
+			ComponentSubjectIds: []int{},
+			Meanings:            createMeanings(data.Meanings),
+			Readings:            []model.VocabularyReading{copyReading(data.Reading)},
+			ContextSentences:    []model.ContextSentence{},
 		}
 
-		kanji, err := db.GetKanji(context.Background(), id)
+		for _, kanji := range data.Kanjis {
+			res, err := db.SearchSubjects(context.Background(), kanji)
 
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, subject := range res.Items {
+				if subject.Object == "kanji" && subject.Characters == kanji {
+					v.ComponentSubjectIds = append(v.ComponentSubjectIds, subject.ID)
+					break
+				}
+
+			}
+
+		}
+
+		if len(v.ComponentSubjectIds) != len(data.Kanjis) {
+			panic(fmt.Sprintf("Missing kanji for %s", data.Characters))
+		}
+
+		err = db.JSONSet(keys.Subject(v.ID), "$", v)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		rsv, err := db.GetKanjiResolved(context.Background(), kanji)
+		nextId += 1
 
-		if err != nil {
-			log.Fatal(err)
+		if (nextId-17072)%10000 == 0 {
+			fmt.Println((float32(nextId) - 17071.0) / 297822.0)
 		}
 
-		jsonLine := struct {
-			Characters string   `json:"characters"`
-			Vocabulary []string `json:"vocabulary"`
-		}{
-			Characters: kanji.Characters,
-			Vocabulary: getVocabulary(rsv.AmalgamationSubjects),
-		}
-
-		jsonBytes, err := json.Marshal(jsonLine)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		_, err = writer.WriteString(string(jsonBytes) + "\n")
-
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
-
-	err = writer.Flush()
-	if err != nil {
-		fmt.Printf("Error flushing the buffer: %v\n", err)
-		return
-	}
-
 }
 
-// func main() {
-// 	nextId := 9166
-
-// 	cfg := config.New()
-// 	db, err := persist.Connect(cfg.RedisURL, cfg.RedisPassword)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
-
-// 	f, err := os.Open("kanjis.jsonl")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer f.Close()
-
-// 	scanner := bufio.NewScanner(f)
-
-// 	for scanner.Scan() {
-// 		line := scanner.Text()
-// 		var data KanjiData
-
-// 		err := json.Unmarshal([]byte(line), &data)
-
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		res, err := db.SearchSubjects(context.Background(), data.Characters)
-
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		if res.TotalCount > 0 {
-// 			continue
-// 		}
-
-// 		kanji := model.Kanji{
-// 			ID:                        nextId,
-// 			Object:                    "kanji",
-// 			Slug:                      data.Slug,
-// 			Characters:                data.Characters,
-// 			VisuallySimilarSubjectIds: []int{},
-// 			AmalgamationSubjectIds:    []int{},
-// 			Meanings:                  copyMeanings(data.Meanings),
-// 			Readings:                  copyReadings(data.Readings),
-// 			ComponentSubjectIds:       []int{},
-// 		}
-
-// 		for _, radical := range data.Radicals {
-// 			res, err := db.SearchSubjects(context.Background(), radical)
-
-// 			if err != nil {
-// 				log.Fatal(err)
-// 			}
-
-// 			for _, subject := range res.Items {
-// 				if subject.Object == "radical" && subject.Characters == radical {
-// 					kanji.ComponentSubjectIds = append(kanji.ComponentSubjectIds, subject.ID)
-// 					break
-// 				}
-
-// 			}
-// 		}
-
-// 		err = db.JSONSet(keys.Subject(kanji.ID), "$", kanji)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		nextId += 1
-// 	}
-// }
-
-func getVocabulary(as []dto.SubjectPreview) []string {
-	result := make([]string, 0)
-
-	for _, a := range as {
-		result = append(result, a.Characters)
+func copyReading(r Reading) model.VocabularyReading {
+	return model.VocabularyReading{
+		Reading: r.Reading,
+		Romaji:  r.Romaji,
+		Primary: r.Primary,
 	}
-
-	return result
 }
 
-func copyMeanings(meanings []Meaning) []model.Meaning {
-	var result []model.Meaning
+func createMeanings(ms []string) []model.Meaning {
+	meanings := make([]model.Meaning, len(ms))
 
-	for _, meaning := range meanings {
-		result = append(result, model.Meaning{
-			Meaning: meaning.Meaning,
-			Primary: meaning.Primary,
-		})
+	for i, m := range ms {
+		meanings[i] = model.Meaning{
+			Meaning: m,
+			Primary: i == 0,
+		}
 	}
 
-	return result
-}
-
-func copyReadings(readings []Reading) []model.KanjiReading {
-	var result []model.KanjiReading
-
-	for _, reading := range readings {
-		result = append(result, model.KanjiReading{
-			Reading: reading.Reading,
-			Type:    reading.Type,
-			Primary: false,
-		})
-	}
-
-	return result
+	return meanings
 }
