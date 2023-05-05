@@ -102,3 +102,34 @@ func (db *DB) GetKanjiResolved(ctx context.Context, kanji *model.Kanji) (*dto.Ka
 
 	return resolvedKanji, nil
 }
+
+func (db *DB) GetKanjiByCharacters(ctx context.Context, characters string) (*model.Kanji, error) {
+
+	query := fmt.Sprintf("@characters:{%s}", characters)
+
+	res, err := db.rdb.Do(ctx, "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "10").Result()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to search subjects: %w", err)
+	}
+
+	_, subjects, err := parseFTSearchResult[dto.SubjectPreview](res)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse search result: %w", err)
+	}
+
+	for _, subject := range subjects {
+		if subject.Object == model.ObjectKanji {
+			k, err := db.GetKanji(ctx, subject.ID)
+
+			if err != nil {
+				return nil, fmt.Errorf("failed to get kanji: %w", err)
+			}
+
+			return k, nil
+		}
+	}
+
+	return nil, fmt.Errorf("kanji not found")
+}

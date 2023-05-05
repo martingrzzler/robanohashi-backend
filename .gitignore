@@ -8,3 +8,4 @@ serviceAccountKey.json
 *terraform*
 
 *venv
+data/dump.rdb

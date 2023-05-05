@@ -65,25 +65,12 @@ func main() {
 			ContextSentences:    []model.ContextSentence{},
 		}
 
-		for _, kanji := range data.Kanjis {
-			res, err := db.SearchSubjects(context.Background(), kanji)
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			for _, subject := range res.Items {
-				if subject.Object == "kanji" && subject.Characters == kanji {
-					v.ComponentSubjectIds = append(v.ComponentSubjectIds, subject.ID)
-					break
-				}
-
-			}
-
+		if !mapKanjis(db, data, &v) {
+			continue
 		}
 
 		if len(v.ComponentSubjectIds) != len(data.Kanjis) {
-			panic(fmt.Sprintf("Missing kanji for %s", data.Characters))
+			fmt.Println(fmt.Sprintf("Missing kanji for %s", data.Characters))
 		}
 
 		err = db.JSONSet(keys.Subject(v.ID), "$", v)
@@ -93,11 +80,37 @@ func main() {
 
 		nextId += 1
 
-		if (nextId-17072)%10000 == 0 {
+		if (nextId-17072)%1000 == 0 {
 			fmt.Println((float32(nextId) - 17071.0) / 297822.0)
 		}
 
 	}
+}
+
+func mapKanjis(db *persist.DB, d VocabData, v *model.Vocabulary) bool {
+	for _, kanji := range d.Kanjis {
+		k, err := db.GetKanjiByCharacters(context.Background(), kanji)
+
+		if err != nil {
+			fmt.Println("Kanji not found: " + kanji)
+			fmt.Println("Vocab: " + d.Characters)
+
+			return false
+
+		}
+
+		v.ComponentSubjectIds = append(v.ComponentSubjectIds, k.ID)
+
+		k.AmalgamationSubjectIds = append(k.AmalgamationSubjectIds, v.ID)
+
+		err = db.JSONSet(keys.Subject(k.ID), "$", k)
+
+		if err != nil {
+			return false
+		}
+	}
+
+	return true
 }
 
 func copyReading(r Reading) model.VocabularyReading {
