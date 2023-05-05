@@ -6,3 +6,5 @@ serviceAccountKey.json
 # Terraform
 /.terraform
 *terraform*
+
+*venv
