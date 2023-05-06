@@ -649,6 +649,9 @@
                 "slug": {
                     "type": "string"
                 },
+                "source": {
+                    "type": "string"
+                },
                 "visually_similar_subjects": {
                     "type": "array",
                     "items": {
@@ -703,10 +706,7 @@
                 "me": {
                     "type": "boolean"
                 },
-                "subject_id": {
-                    "description": "must be string ensure that TAG for the index works as expected",
-                    "type": "string"
-                },
+                "subject": {},
                 "text": {
                     "type": "string"
                 },
@@ -756,6 +756,9 @@
                 },
                 "slug": {
                     "type": "string"
+                },
+                "source": {
+                    "type": "string"
                 }
             }
         },
@@ -795,6 +798,9 @@
                     }
                 },
                 "slug": {
+                    "type": "string"
+                },
+                "source": {
                     "type": "string"
                 }
             }
@@ -865,6 +871,9 @@
                     }
                 },
                 "slug": {
+                    "type": "string"
+                },
+                "source": {
                     "type": "string"
                 }
             }

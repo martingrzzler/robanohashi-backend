@@ -1,4 +1,4 @@
-### Roba no hashi
+# Roba no hashi
 
 From the German word "Eselsbrücke" meaning mnemonic.
 
@@ -6,3 +6,45 @@ This App allows users to lookup Radicals, Kanji and Vocabulary and mnemonics to 
 The difference from something like WaniKani is that user can upload their own menmonics and share with a community.
 
 The app currently runs on web as an alpa here: [https://robanohashi.com](https://robanohashi.com)
+API documentation: [.robanohashi.org/docs/index.html](.robanohashi.org/docs/index.html)
+
+### Development
+
+For development I suggest to start a redis docker container.
+```bash
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  -p 8001:8001 \
+  -v "$(pwd)/data:/data" \
+  redis/redis-stack:latest
+```
+
+#### Migrations
+Migrations for the Redis instance are performed locally and the `dump.rdb` files are backed on `S3`.
+Create a new package in `/cmd/<package>` for the migration code.
+
+#### Docs
+1. Download the `swag` cli.
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+2. Run `swag init` to generate the files
+
+#### Deployment
+```bash
+docker build -t martingrzzler/robanohashi-api:latest .
+```
+```bash
+docker push martingrzzler/robanohashi-api:latest
+```
+
+On the production server update individual docker swarm services:
+```bash
+docker service update --image martingrzzler/robanohashi-api:latest robanohashi_api
+```
+
+```bash
+docker service update robanohashi_redis --force
+```
+

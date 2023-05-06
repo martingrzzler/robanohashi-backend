@@ -57,6 +57,8 @@ definitions:
         type: array
       slug:
         type: string
+      source:
+        type: string
       visually_similar_subjects:
         items:
           $ref: '#/definitions/dto.SubjectPreview'
@@ -92,9 +94,7 @@ definitions:
         type: string
       me:
         type: boolean
-      subject_id:
-        description: must be string ensure that TAG for the index works as expected
-        type: string
+      subject: {}
       text:
         type: string
       updated_at:
@@ -128,6 +128,8 @@ definitions:
         $ref: '#/definitions/model.Object'
       slug:
         type: string
+      source:
+        type: string
     type: object
   dto.StatusResponse:
     properties:
@@ -153,6 +155,8 @@ definitions:
           type: string
         type: array
       slug:
+        type: string
+      source:
         type: string
     type: object
   dto.ToggleFavoriteMeaningMnemonic:
@@ -199,6 +203,8 @@ definitions:
           $ref: '#/definitions/model.VocabularyReading'
         type: array
       slug:
+        type: string
+      source:
         type: string
     type: object
   dto.VoteMeaningMnemonic:
