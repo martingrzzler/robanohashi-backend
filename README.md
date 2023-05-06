@@ -48,3 +48,16 @@ docker service update --image martingrzzler/robanohashi-api:latest robanohashi_a
 docker service update robanohashi_redis --force
 ```
 
+#### Test
+Integration tests:
+
+Make sure to start an empty redis instance.
+```bash
+go test ./persist
+```
+
+Unit tests:
+```bash
+go test ./internal/utils
+```
+
