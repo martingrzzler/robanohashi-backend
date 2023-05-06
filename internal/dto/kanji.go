@@ -5,6 +5,7 @@ import "robanohashi/internal/model"
 type Kanji struct {
 	ID                      int                  `json:"id"`
 	Object                  model.Object         `json:"object"`
+	Source                  string               `json:"source"`
 	Characters              string               `json:"characters"`
 	Slug                    string               `json:"slug"`
 	ReadingMnemonic         string               `json:"reading_mnemonic"`
@@ -21,6 +22,10 @@ func (k Kanji) GetID() int {
 
 func (k Kanji) GetObject() model.Object {
 	return k.Object
+}
+
+func (k Kanji) GetSource() string {
+	return k.Source
 }
 
 func (k Kanji) GetCharacters() string {

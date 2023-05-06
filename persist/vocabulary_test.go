@@ -19,8 +19,8 @@ func ExampleDB_GetVocabulary() {
 	fmt.Println(err)
 
 	// Output:
-	// &{3 vocabulary one 一 [2] [{one true}] read it out loud [{I took one step forward 私は一歩前に進んだ わたしはいっぽうまえにすすんだ}] [{いち true ichi}]}
-	// subject is not a vocabulary
+	// &{3 vocabulary dictionary one 一 [2] [{one true}] read it out loud [{I took one step forward 私は一歩前に進んだ わたしはいっぽうまえにすすんだ}] [{いち true ichi}]}
+	// failed to get json: redis: nil
 }
 
 func ExampleDB_GetVocabularyResolved() {
@@ -37,6 +37,6 @@ func ExampleDB_GetVocabularyResolved() {
 	fmt.Println(vocab)
 
 	// Output:
-	// &{3 vocabulary one 一 [{2 kanji one 一  [いち] [one]}] [{one true}] read it out loud [{I took one step forward 私は一歩前に進んだ わたしはいっぽうまえにすすんだ}] [{いち true ichi}]}
+	// &{3 vocabulary one dictionary 一 [{2 kanji one wanikani 一  [いち] [one]}] [{one true}] read it out loud [{I took one step forward 私は一歩前に進んだ わたしはいっぽうまえにすすんだ}] [{いち true ichi}]}
 
 }

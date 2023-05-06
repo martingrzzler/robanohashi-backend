@@ -12,7 +12,7 @@ import (
 )
 
 func (db *DB) GetVocabulary(ctx context.Context, id int) (*model.Vocabulary, error) {
-	data, err := db.JSONGet(ctx, keys.Subject(id))
+	data, err := db.JSONGet(ctx, keys.Vocabulary(id))
 	if err != nil {
 		return nil, err
 	}
@@ -24,10 +24,6 @@ func (db *DB) GetVocabulary(ctx context.Context, id int) (*model.Vocabulary, err
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}
 
-	if vocab.Object != model.ObjectVocabulary {
-		return nil, fmt.Errorf("subject is not a vocabulary")
-	}
-
 	return vocab, nil
 }
 
@@ -37,7 +33,7 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 	componentCmds := make([]*redis.Cmd, len(vocab.ComponentSubjectIds))
 
 	for i, id := range vocab.ComponentSubjectIds {
-		componentCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
+		componentCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Kanji(id))
 	}
 
 	_, err := pipe.Exec(ctx)
@@ -50,6 +46,7 @@ func (db *DB) GetVocabularyResolved(ctx context.Context, vocab *model.Vocabulary
 		ID:                vocab.ID,
 		Object:            vocab.Object,
 		Slug:              vocab.Slug,
+		Source:            vocab.Source.String(),
 		Characters:        vocab.Characters,
 		Meanings:          vocab.Meanings,
 		ReadingMnemonic:   vocab.ReadingMnemonic,

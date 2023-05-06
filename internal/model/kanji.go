@@ -3,6 +3,7 @@ package model
 type Kanji struct {
 	ID                        int            `json:"id"`
 	Object                    Object         `json:"object"`
+	Source                    Source         `json:"source"`
 	Characters                string         `json:"characters"`
 	Slug                      string         `json:"slug"`
 	ReadingMnemonic           string         `json:"reading_mnemonic"`
@@ -23,6 +24,10 @@ func (k Kanji) GetObject() Object {
 
 func (k Kanji) GetSlug() string {
 	return k.Slug
+}
+
+func (k Kanji) GetSource() string {
+	return k.Source.String()
 }
 
 func (k Kanji) GetCharacters() string {

@@ -3,6 +3,7 @@ package model
 type Radical struct {
 	ID     int    `json:"id"`
 	Object Object `json:"object"`
+	Source Source `json:"source"`
 	Slug   string `json:"slug"`
 	// null for some radicals -> use character image (svg)
 	Characters             string    `json:"characters"`
@@ -12,15 +13,9 @@ type Radical struct {
 	MeaningMnemonic        string    `json:"meaning_mnemonic"`
 }
 
-type ResolvedRadical struct {
-	ID                   int       `json:"id"`
-	Object               Object    `json:"object"`
-	Slug                 string    `json:"slug"`
-	Characters           string    `json:"characters"`
-	CharacterImage       string    `json:"character_image"`
-	AmalgamationSubjects []Kanji   `json:"amalgamation_subjects"`
-	Meanings             []Meaning `json:"meanings"`
-	MeaningMnemonic      string    `json:"meaning_mnemonic"`
+// a radicals are from wanikani
+func (r Radical) GetSource() string {
+	return r.Source.String()
 }
 
 func (r Radical) GetID() int {

@@ -3,6 +3,7 @@ package model
 type Vocabulary struct {
 	ID                  int                 `json:"id"`
 	Object              Object              `json:"object"`
+	Source              Source              `json:"source"`
 	Slug                string              `json:"slug"`
 	Characters          string              `json:"characters"`
 	ComponentSubjectIds []int               `json:"component_subject_ids"`
@@ -10,6 +11,10 @@ type Vocabulary struct {
 	ReadingMnemonic     string              `json:"reading_mnemonic"`
 	ContextSentences    []ContextSentence   `json:"context_sentences"`
 	Readings            []VocabularyReading `json:"readings"`
+}
+
+func (v Vocabulary) GetSource() string {
+	return v.Source.String()
 }
 
 func (v Vocabulary) GetID() int {

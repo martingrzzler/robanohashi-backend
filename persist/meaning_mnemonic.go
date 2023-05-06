@@ -135,37 +135,41 @@ func (db *DB) ResolveMeaningMnemonics(ctx context.Context, uid string, mnemonics
 }
 
 func (db *DB) resolveMnemonicSubject(ctx context.Context, sid int) (dto.MnemonicSubject, error) {
-	res, err := db.JSONGet(ctx, keys.Subject(sid))
+	// identify what type of subject it is
+	res, err := db.rdb.Exists(ctx, keys.Kanji(sid)).Result()
 
 	if err != nil {
-		return nil, err
+		return dto.Kanji{}, fmt.Errorf("failed to check if subject is kanji: %w", err)
 	}
 
-	var data map[string]any
-	err = json.Unmarshal([]byte(res.(string)), &data)
+	// is kanji
+	if res == 1 {
+		k, err := db.GetKanji(ctx, sid)
+
+		if err != nil {
+			return dto.Kanji{}, fmt.Errorf("failed to get kanji: %w", err)
+		}
+
+		return db.GetKanjiResolved(ctx, k)
+	}
+
+	res, err = db.rdb.Exists(ctx, keys.Vocabulary(sid)).Result()
 
 	if err != nil {
-		return nil, err
+		return dto.Vocabulary{}, fmt.Errorf("failed to check whether vocabulary exists: %w", err)
+	}
+	// not a kanji nor a vocabulary
+	if res == 0 {
+		return dto.Vocabulary{}, fmt.Errorf("subject with id %d does not exist", sid)
 	}
 
-	switch model.Object(data["object"].(string)) {
-	case model.ObjectKanji:
-		kanji := &model.Kanji{}
-		err = json.Unmarshal([]byte(res.(string)), kanji)
-		if err != nil {
-			return nil, err
-		}
-		return db.GetKanjiResolved(ctx, kanji)
-	case "vocabulary":
-		vocab := &model.Vocabulary{}
-		err = json.Unmarshal([]byte(res.(string)), vocab)
-		if err != nil {
-			return nil, err
-		}
-		return db.GetVocabularyResolved(ctx, vocab)
+	v, err := db.GetVocabulary(ctx, sid)
+
+	if err != nil {
+		return dto.Vocabulary{}, fmt.Errorf("failed to get vocabulary: %w", err)
 	}
 
-	return nil, fmt.Errorf("unknown object type: %s", data["object"].(string))
+	return db.GetVocabularyResolved(ctx, v)
 }
 
 func (db *DB) GetMeaningMnemonic(ctx context.Context, id string) (*model.MeaningMnemonic, error) {

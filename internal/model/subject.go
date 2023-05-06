@@ -18,6 +18,24 @@ const (
 	ObjectVocabulary Object = "vocabulary"
 )
 
+type Source int
+
+const (
+	SourceWaniKani   Source = 0
+	SourceDictionary Source = 1
+)
+
+func (s Source) String() string {
+	switch s {
+	case SourceWaniKani:
+		return "wanikani"
+	case SourceDictionary:
+		return "dictionary"
+	default:
+		return "unknown"
+	}
+}
+
 type Meaning struct {
 	Meaning string `json:"meaning"`
 	Primary bool   `json:"primary"`
@@ -60,6 +78,7 @@ type Subject interface {
 	GetID() int
 	GetObject() Object
 	GetSlug() string
+	GetSource() string
 	GetCharacters() string
 	GetCharacterImage() string
 	GetReadings() []Reading

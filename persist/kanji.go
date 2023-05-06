@@ -12,7 +12,7 @@ import (
 )
 
 func (db *DB) GetKanji(ctx context.Context, id int) (*model.Kanji, error) {
-	data, err := db.JSONGet(ctx, keys.Subject(id))
+	data, err := db.JSONGet(ctx, keys.Kanji(id))
 	if err != nil {
 		return nil, err
 	}
@@ -22,10 +22,6 @@ func (db *DB) GetKanji(ctx context.Context, id int) (*model.Kanji, error) {
 	err = json.Unmarshal([]byte(data.(string)), kanji)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
-	}
-
-	if kanji.Object != model.ObjectKanji {
-		return nil, fmt.Errorf("subject is not a kanji")
 	}
 
 	return kanji, nil
@@ -38,15 +34,15 @@ func (db *DB) GetKanjiResolved(ctx context.Context, kanji *model.Kanji) (*dto.Ka
 	amalgamationCmds := make([]*redis.Cmd, len(kanji.AmalgamationSubjectIds))
 
 	for i, id := range kanji.ComponentSubjectIds {
-		componentsCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
+		componentsCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Radical(id))
 	}
 
 	for i, id := range kanji.VisuallySimilarSubjectIds {
-		visuallySimCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
+		visuallySimCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Kanji(id))
 	}
 
 	for i, id := range kanji.AmalgamationSubjectIds {
-		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
+		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Vocabulary(id))
 	}
 
 	_, err := pipe.Exec(ctx)
@@ -59,6 +55,7 @@ func (db *DB) GetKanjiResolved(ctx context.Context, kanji *model.Kanji) (*dto.Ka
 		ID:                      kanji.ID,
 		Slug:                    kanji.Slug,
 		Characters:              kanji.Characters,
+		Source:                  kanji.Source.String(),
 		Object:                  kanji.Object,
 		Meanings:                kanji.Meanings,
 		Readings:                kanji.Readings,

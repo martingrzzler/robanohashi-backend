@@ -61,6 +61,7 @@ func seed() error {
 		ID:                     2,
 		Object:                 "kanji",
 		Slug:                   "one",
+		Source:                 model.SourceWaniKani,
 		Characters:             "一",
 		ReadingMnemonic:        "read it out loud",
 		AmalgamationSubjectIds: []int{3},
@@ -86,6 +87,7 @@ func seed() error {
 		Object:              "vocabulary",
 		Slug:                "one",
 		Characters:          "一",
+		Source:              model.SourceDictionary,
 		ComponentSubjectIds: []int{2},
 		Meanings: []model.Meaning{
 			{
@@ -110,17 +112,17 @@ func seed() error {
 		},
 	}
 
-	err = db.JSONSet(keys.Subject(r.ID), "$", r)
+	err = db.JSONSet(keys.Radical(r.ID), "$", r)
 	if err != nil {
 		return err
 	}
 
-	err = db.JSONSet(keys.Subject(k.ID), "$", k)
+	err = db.JSONSet(keys.Kanji(k.ID), "$", k)
 	if err != nil {
 		return err
 	}
 
-	err = db.JSONSet(keys.Subject(v.ID), "$", v)
+	err = db.JSONSet(keys.Vocabulary(v.ID), "$", v)
 	if err != nil {
 		return err
 	}

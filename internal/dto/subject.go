@@ -10,4 +10,5 @@ type MnemonicSubject interface {
 	GetReadings() []model.Reading
 	GetMeanings() []model.Meaning
 	GetComponentSubjects() []SubjectPreview
+	GetSource() string
 }

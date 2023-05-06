@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"robanohashi/internal/dto"
+	robaUtil "robanohashi/internal/util"
 	"robanohashi/persist/keys"
 	"strings"
 
@@ -80,11 +81,14 @@ func (db *DB) SearchSubjects(ctx context.Context, search string) (*dto.List[dto.
 	query := ""
 	if len(strings.Split(search, " ")) > 1 {
 		query = fmt.Sprintf("@meaning:(%s*)", search)
+	} else if robaUtil.SingleKanji(search) {
+		query = fmt.Sprintf("@characters:{%s*}", search)
 	} else {
 		query = fmt.Sprintf("((@characters:{%s*}) => { $weight: 2.0 } | (@meaning:(%s*)) | (@reading:{%s*}) | (@romaji:{%s*}))", search, search, search, search)
 	}
 
-	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "LIMIT", "0", "300").Result()
+	// sort by source, show wanikani first (source 0)
+	res, err := db.rdb.Do(context.Background(), "FT.SEARCH", keys.SubjectIndex(), query, "SORTBY", "source", "ASC", "LIMIT", "0", "300", "RETURN", "1", "$").Result()
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to search subjects: %w", err)

@@ -50,14 +50,5 @@ func GetRadical(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Radical{
-		ID:                   resolved.ID,
-		Object:               resolved.Object,
-		Slug:                 resolved.Slug,
-		Characters:           resolved.Characters,
-		CharacterImage:       resolved.CharacterImage,
-		AmalgamationSubjects: dto.CreateSubjectPreviews(resolved.AmalgamationSubjects),
-		Meanings:             resolved.Meanings,
-		MeaningMnemonic:      resolved.MeaningMnemonic,
-	})
+	c.JSON(http.StatusOK, resolved)
 }

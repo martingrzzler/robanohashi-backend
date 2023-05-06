@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist/keys"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func (db *DB) GetRadical(ctx context.Context, id int) (*model.Radical, error) {
-	data, err := db.JSONGet(ctx, keys.Subject(id))
+	data, err := db.JSONGet(ctx, keys.Radical(id))
 	if err != nil {
 		return nil, err
 	}
@@ -23,20 +24,16 @@ func (db *DB) GetRadical(ctx context.Context, id int) (*model.Radical, error) {
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}
 
-	if radical.Object != model.ObjectRadical {
-		return nil, fmt.Errorf("subject is not a radical")
-	}
-
 	return radical, nil
 }
 
-func (db *DB) GetRadicalResolved(ctx context.Context, radical *model.Radical) (*model.ResolvedRadical, error) {
+func (db *DB) GetRadicalResolved(ctx context.Context, radical *model.Radical) (*dto.Radical, error) {
 	pipe := db.rdb.Pipeline()
 
 	amalgamationCmds := make([]*redis.Cmd, len(radical.AmalgamationSubjectIds))
 
 	for i, id := range radical.AmalgamationSubjectIds {
-		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Subject(id))
+		amalgamationCmds[i] = pipe.Do(context.Background(), "JSON.GET", keys.Kanji(id))
 	}
 
 	_, err := pipe.Exec(ctx)
@@ -45,15 +42,16 @@ func (db *DB) GetRadicalResolved(ctx context.Context, radical *model.Radical) (*
 		return nil, fmt.Errorf("failed to execute pipeline: %w", err)
 	}
 
-	resolvedRadical := &model.ResolvedRadical{
+	resolvedRadical := &dto.Radical{
 		ID:                   radical.ID,
 		Object:               radical.Object,
 		Slug:                 radical.Slug,
+		Source:               radical.Source.String(),
 		Characters:           radical.Characters,
 		CharacterImage:       radical.CharacterImage,
 		Meanings:             radical.Meanings,
 		MeaningMnemonic:      radical.MeaningMnemonic,
-		AmalgamationSubjects: make([]model.Kanji, len(amalgamationCmds)),
+		AmalgamationSubjects: make([]dto.SubjectPreview, len(amalgamationCmds)),
 	}
 
 	for i, cmd := range amalgamationCmds {
@@ -64,7 +62,7 @@ func (db *DB) GetRadicalResolved(ctx context.Context, radical *model.Radical) (*
 			return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 		}
 
-		resolvedRadical.AmalgamationSubjects[i] = kanji
+		resolvedRadical.AmalgamationSubjects[i] = dto.CreateSubjectPreview(kanji)
 	}
 
 	return resolvedRadical, nil

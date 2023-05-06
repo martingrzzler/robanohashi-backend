@@ -55,12 +55,13 @@ func (db *DB) createSubjectIndex() error {
 		"FT.CREATE",
 		keys.SubjectIndex(),
 		"ON", "JSON",
-		"PREFIX", "1", "subject:",
+		"PREFIX", "3", "radical:", "kanji:", "vocabulary:",
 		"SCHEMA",
 		"$.characters", "AS", "characters", "TAG",
 		"$.meanings.*.meaning", "AS", "meaning", "TEXT",
 		"$.readings.*.reading", "AS", "reading", "TAG",
 		"$.readings.*.romaji", "AS", "romaji", "TAG",
+		"$.source", "AS", "source", "NUMERIC", "SORTABLE",
 	).Err()
 
 	return err

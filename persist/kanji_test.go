@@ -19,8 +19,8 @@ func ExampleDB_GetKanji() {
 	fmt.Println(err)
 
 	// Output:
-	// &{2 kanji 一 one read it out loud [3] [{one true}] [{いち true onyomi}] [1] []}
-	// subject is not a kanji
+	// &{2 kanji wanikani 一 one read it out loud [3] [{one true}] [{いち true onyomi}] [1] []}
+	// failed to get json: redis: nil
 }
 
 func ExampleDB_GetKanjiResolved() {
@@ -34,5 +34,5 @@ func ExampleDB_GetKanjiResolved() {
 	fmt.Println(kanji)
 
 	// Output:
-	// &{2 kanji 一 one read it out loud [{3 vocabulary one 一  [いち] [one]}] [{one true}] [{いち true onyomi}] [{1 radical one 一  [] [one]}] []}
+	// &{2 kanji wanikani 一 one read it out loud [{3 vocabulary one dictionary 一  [いち] [one]}] [{one true}] [{いち true onyomi}] [{1 radical one wanikani 一  [] [one]}] []}
 }

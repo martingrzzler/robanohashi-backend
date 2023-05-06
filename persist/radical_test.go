@@ -19,8 +19,8 @@ func ExampleDB_GetRadical() {
 	fmt.Println(err)
 
 	// Output:
-	// &{1 radical one 一  [2] [{one true}] This is a radical for one}
-	// subject is not a radical
+	// &{1 radical wanikani one 一  [2] [{one true}] This is a radical for one}
+	// failed to get json: redis: nil
 }
 
 func ExampleDB_GetRadicalResolved() {
@@ -34,5 +34,5 @@ func ExampleDB_GetRadicalResolved() {
 	fmt.Println(radical)
 
 	// Output:
-	// &{1 radical one 一  [{2 kanji 一 one read it out loud [3] [{one true}] [{いち true onyomi}] [1] []}] [{one true}] This is a radical for one}
+	// &{1 radical one wanikani 一  [{2 kanji one wanikani 一  [いち] [one]}] [{one true}] This is a radical for one}
 }
