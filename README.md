@@ -31,6 +31,9 @@ go install github.com/swaggo/swag/cmd/swag@latest
 ```
 2. Run `swag init` to generate the files
 
+#### Indices
+Run `go run ./cmd/indices` to recreate indices
+
 #### Deployment
 ```bash
 docker build -t martingrzzler/robanohashi-api:latest .
