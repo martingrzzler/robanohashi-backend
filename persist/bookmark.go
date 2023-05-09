@@ -49,5 +49,5 @@ func (db *DB) GetUserBookmarkedSubjects(ctx context.Context, uid string) (*dto.L
 		subjects[i] = s
 	}
 
-	return &dto.List[dto.SubjectPreview]{Items: subjects}, nil
+	return &dto.List[dto.SubjectPreview]{Items: subjects, TotalCount: int64(len(subjects))}, nil
 }

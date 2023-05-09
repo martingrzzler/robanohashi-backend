@@ -62,7 +62,7 @@ func Create(cfg config.Config) *gin.Engine {
 	authorized.GET("/user/meaning_mnemonics", controllers.GetUserMeaningMnemonics)
 	authorized.POST("/subject/bookmark", controllers.ToggleSubjectBookmarked)
 	authorized.GET("/user/bookmarks", controllers.GetUserBookmarkedSubjects)
-	authorized.POST("/subject/toggle_bookmark", controllers.GetBookmarkStatus)
+	authorized.POST("/subject/toggle_bookmark", controllers.ToggleSubjectBookmarked)
 	authorized.GET("subject/:id/bookmark/status", controllers.GetBookmarkStatus)
 
 	r.Use(middleware.ValidateFirebaseToken(auth, false))
