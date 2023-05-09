@@ -60,6 +60,8 @@ func Create(cfg config.Config) *gin.Engine {
 	authorized.POST("/meaning_mnemonic/toggle_favorite", controllers.ToggleFavoriteMeaningMnemonic)
 	authorized.GET("/meaning_mnemonics/favorites", controllers.GetFavoriteMeaningMnemonics)
 	authorized.GET("/user/meaning_mnemonics", controllers.GetUserMeaningMnemonics)
+	authorized.POST("/subject/bookmark", controllers.ToggleSubjectBookmarked)
+	authorized.GET("/user/bookmarks", controllers.GetUserBookmarkedSubjects)
 
 	r.Use(middleware.ValidateFirebaseToken(auth, false))
 
