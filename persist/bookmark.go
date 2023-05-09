@@ -9,6 +9,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+func (db *DB) SubjectBookmarked(ctx context.Context, subjectKey string, uid string) (bool, error) {
+	return db.rdb.SIsMember(ctx, keys.UserBoomarks(uid), subjectKey).Result()
+}
+
 func (db *DB) ToggleSubjectBookmarked(ctx context.Context, subjectKey string, uid string) (string, error) {
 	return db.toggleSetValue(ctx, keys.UserBoomarks(uid), subjectKey)
 }

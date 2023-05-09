@@ -32,6 +32,38 @@ func ExampleDB_ToggleSubjectBookmarked() {
 	// removed
 }
 
+func ExampleDB_SubjectBookmarked() {
+	db.ToggleSubjectBookmarked(context.Background(), keys.Radical(1), "testuser")
+	db.ToggleSubjectBookmarked(context.Background(), keys.Kanji(2), "testuser")
+
+	bookmarked, err := db.SubjectBookmarked(context.Background(), keys.Radical(1), "testuser")
+
+	if err != nil {
+		log.Fatalf("failed to get subject bookmark status: %v", err)
+	}
+
+	fmt.Println(bookmarked)
+
+	bookmarked, _ = db.SubjectBookmarked(context.Background(), keys.Kanji(2), "testuser")
+
+	fmt.Println(bookmarked)
+
+	bookmarked, _ = db.SubjectBookmarked(context.Background(), keys.Vocabulary(3), "testuser")
+
+	fmt.Println(bookmarked)
+
+	err = seed()
+
+	if err != nil {
+		log.Fatalf("failed to reseed redis: %v", err)
+	}
+
+	// Output:
+	// true
+	// true
+	// false
+}
+
 func ExampleDB_GetUserBookmarkedSubjects() {
 
 	db.ToggleSubjectBookmarked(context.Background(), keys.Radical(1), "testuser")
@@ -59,7 +91,6 @@ func ExampleDB_GetUserBookmarkedSubjects() {
 	}
 
 	// Output:
-	// &{0 [{3 vocabulary one dictionary 一  [いち] [one]} {2 kanji one wanikani 一  [いち] [one]} {1 radical one wanikani 一  [] [one]}]}
-	// &{0 [{3 vocabulary one dictionary 一  [いち] [one]} {2 kanji one wanikani 一  [いち] [one]}]}
-
+	// &{0 [{2 kanji one wanikani 一  [いち] [one]} {3 vocabulary one dictionary 一  [いち] [one]} {1 radical one wanikani 一  [] [one]}]}
+	// &{0 [{2 kanji one wanikani 一  [いち] [one]} {3 vocabulary one dictionary 一  [いち] [one]}]}
 }

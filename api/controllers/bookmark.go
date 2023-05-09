@@ -2,19 +2,60 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"robanohashi/internal/dto"
 	"robanohashi/internal/model"
 	"robanohashi/persist"
 	"robanohashi/persist/keys"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 // @tags Subject
+// @summary get bookmark status for a subject
+// @produce json
+// @router /subject/bookmark/status [post]
+// @success 200 {object} dto.BookmarkStatus
+// @failure 500 {object} dto.ErrorResponse
+// @failure 400 {object} dto.ErrorResponse
+// @param request body dto.GetBookmarkStatus true "get subject bookmark status"
+// @security Bearer
+func GetBookmarkStatus(c *gin.Context) {
+	db := c.MustGet("db").(*persist.DB)
+	uid := c.MustGet("uid").(string)
+
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "id must be an integer"})
+		return
+	}
+
+	object := c.Query("object")
+
+	if object == "" {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "object must be provided"})
+		return
+	}
+
+	subjectKey := fmt.Sprintf("%s:%d", string(object), id)
+
+	bookmarked, err := db.SubjectBookmarked(context.Background(), subjectKey, uid)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.BookmarkStatus{Bookmarked: bookmarked})
+}
+
+// @tags Subject
 // @summary toggle bookmark for a subject
 // @produce json
-// @router /subject/bookmark [post]
+// @router /subject/toggle_bookmark [post]
 // @success 200 {object} string
 // @failure 500 {object} dto.ErrorResponse
 // @failure 400 {object} dto.ErrorResponse
