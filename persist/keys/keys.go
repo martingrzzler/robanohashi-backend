@@ -42,3 +42,7 @@ func SubjectIndex() string {
 func MeaningMnemonicIndex() string {
 	return "meaning_mnemonic_index"
 }
+
+func UserBoomarks(userId string) string {
+	return fmt.Sprintf("user_bookmarks:%s", userId)
+}
