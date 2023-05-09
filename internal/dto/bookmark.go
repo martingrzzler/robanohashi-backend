@@ -7,11 +7,6 @@ type ToggleSubjectBookmark struct {
 	Object    model.Object `json:"object" binding:"required"`
 }
 
-type GetBookmarkStatus struct {
-	Object    model.Object `json:"object" binding:"required"`
-	SubjectID int          `json:"subject_id" binding:"required"`
-}
-
 type BookmarkStatus struct {
 	Bookmarked bool `json:"bookmarked"`
 }

@@ -442,7 +442,64 @@ const docTemplate = `{
                 }
             }
         },
-        "/subject/bookmark": {
+        "/subject/bookmark/status": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "summary": "get bookmark status for a subject",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Subject ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "kanji",
+                            "radical",
+                            "vocabulary"
+                        ],
+                        "type": "string",
+                        "description": "Subject object",
+                        "name": "object",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BookmarkStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/subject/toggle_bookmark": {
             "post": {
                 "security": [
                     {
@@ -655,6 +712,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.BookmarkStatus": {
+            "type": "object",
+            "properties": {
+                "bookmarked": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.CreateMeaningMnemonic": {
             "type": "object",
             "required": [

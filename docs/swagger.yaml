@@ -1,4 +1,9 @@
 definitions:
+  dto.BookmarkStatus:
+    properties:
+      bookmarked:
+        type: boolean
+    type: object
   dto.CreateMeaningMnemonic:
     properties:
       object:
@@ -573,7 +578,44 @@ paths:
       summary: get meaning mnemonics optionally with user data if authenticated
       tags:
       - Subject
-  /subject/bookmark:
+  /subject/bookmark/status:
+    post:
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Subject object
+        enum:
+        - kanji
+        - radical
+        - vocabulary
+        in: query
+        name: object
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BookmarkStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: get bookmark status for a subject
+      tags:
+      - Subject
+  /subject/toggle_bookmark:
     post:
       parameters:
       - description: toggle subject bookmark

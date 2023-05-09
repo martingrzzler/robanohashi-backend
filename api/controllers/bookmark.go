@@ -20,7 +20,8 @@ import (
 // @success 200 {object} dto.BookmarkStatus
 // @failure 500 {object} dto.ErrorResponse
 // @failure 400 {object} dto.ErrorResponse
-// @param request body dto.GetBookmarkStatus true "get subject bookmark status"
+// @param id path int true "Subject ID"
+// @param object query model.Object true "Subject object"
 // @security Bearer
 func GetBookmarkStatus(c *gin.Context) {
 	db := c.MustGet("db").(*persist.DB)
