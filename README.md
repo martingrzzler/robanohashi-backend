@@ -5,8 +5,8 @@ From the German word "Eselsbrücke" meaning mnemonic.
 This App allows users to lookup Radicals, Kanji and Vocabulary and mnemonics to aid learning.
 The difference from something like WaniKani is that user can upload their own menmonics and share with a community.
 
-The app currently runs on web as an alpa here: [https://robanohashi.com](https://robanohashi.com)
-API documentation: [.robanohashi.org/docs/index.html](.robanohashi.org/docs/index.html)
+The app currently runs on web as an alpa here: [robanohashi.org](https://robanohashi.org)
+API documentation: [api.robanohashi.org/docs/index.html](https://api.robanohashi.org/docs/index.html)
 
 ### Redis schema
 ![redis-schema](https://github.com/martingrzzler/robanohashi-backend/assets/54838006/376585fa-3f64-4d0d-a863-43280a278fe0)
