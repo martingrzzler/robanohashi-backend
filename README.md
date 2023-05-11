@@ -9,6 +9,7 @@ The app currently runs on web as an alpa here: [https://robanohashi.com](https:/
 API documentation: [.robanohashi.org/docs/index.html](.robanohashi.org/docs/index.html)
 
 ### Redis schema
+![redis-schema](https://github.com/martingrzzler/robanohashi-backend/assets/54838006/376585fa-3f64-4d0d-a863-43280a278fe0)
 
 ### Authentication
 Authentication is handled entirely by Firebase. This api only validates the JSON web token for endpoints that require it.
