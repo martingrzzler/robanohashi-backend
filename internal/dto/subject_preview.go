@@ -43,10 +43,10 @@ func CreateSubjectPreviews[T model.Subject](subjects []T) []SubjectPreview {
 
 // extracts the meaning from the meaning array and places the primary meaning at the beginning
 func extractMeanings(ms []model.Meaning) []string {
-	meanings := make([]string, 1)
+	meanings := make([]string, 0)
 	for _, m := range ms {
 		if m.Primary {
-			meanings[0] = m.Meaning
+			meanings = append([]string{m.Meaning}, meanings...)
 			continue
 		}
 		meanings = append(meanings, m.Meaning)
@@ -55,10 +55,10 @@ func extractMeanings(ms []model.Meaning) []string {
 }
 
 func extractReadings[T model.Reading](rs []T) []string {
-	readings := make([]string, 1)
+	readings := make([]string, 0)
 	for _, r := range rs {
 		if r.IsPrimary() {
-			readings[0] = r.GetReading()
+			readings = append([]string{r.GetReading()}, readings...)
 			continue
 		}
 		readings = append(readings, r.GetReading())
